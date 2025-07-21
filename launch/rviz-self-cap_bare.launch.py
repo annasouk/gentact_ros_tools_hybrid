@@ -58,6 +58,12 @@ def generate_launch_description():
         name='tof_talker'
     )
 
+    camera_node = Node(
+        package='realsense2_camera',
+        executable='realsense2_camera_node',
+        name='cam_pub',
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
@@ -68,7 +74,8 @@ def generate_launch_description():
         # TimerAction(period=2.0, actions=[robot_state_publisher_node]),
         #TimerAction(period=3.0, actions=[joint_state_publisher_node]),
         # TimerAction(period=4.0, actions=[robot_st_base_node]),
-        TimerAction(period=5.0, actions=[tof_listener]),
+        TimerAction(period=1.0, actions=[tof_listener]),
+        TimerAction(period=2.0, actions=[camera_node]),
         # TimerAction(period=6.0, actions=[pointcloud_talker]),
 
     ])

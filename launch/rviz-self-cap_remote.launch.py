@@ -58,6 +58,12 @@ def generate_launch_description():
         name='tof_talker'
     )
 
+    camera_node_2 = Node(
+        package='camera_tools',
+        executable='basic_camera_node',
+        name='cam_pub_2',
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
@@ -65,10 +71,11 @@ def generate_launch_description():
             description='Use simulation (Gazebo) clock if true'
         ),
         # TimerAction(period=0.0, actions=[rviz_node]),
-        TimerAction(period=2.0, actions=[robot_state_publisher_node]),
+        TimerAction(period=1.0, actions=[robot_state_publisher_node]),
         #TimerAction(period=3.0, actions=[joint_state_publisher_node]),
-        TimerAction(period=4.0, actions=[robot_st_base_node]),
+        TimerAction(period=1.0, actions=[robot_st_base_node]),
         # TimerAction(period=5.0, actions=[tof_listener]),
-        TimerAction(period=6.0, actions=[pointcloud_talker]),
+        TimerAction(period=1.0, actions=[camera_node_2]),
+        # TimerAction(period=6.0, actions=[pointcloud_talker]),
 
     ])
