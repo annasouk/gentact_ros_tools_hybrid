@@ -97,6 +97,12 @@ def generate_launch_description():
         name='cam_pub',
     )
 
+    camera_node_2 = Node(
+        package='camera_tools',
+        executable='basic_camera_node',
+        name='cam_pub_2',
+    )
+
     pcl_node = Node(
         package='gentact_ros_tools',
         executable='capacitive_pcl',
@@ -115,13 +121,14 @@ def generate_launch_description():
             default_value='false',
             description='Use simulation (Gazebo) clock if true'
         ),
-        serial_port_arg,
-        baud_rate_arg,
+        # serial_port_arg,
+        # baud_rate_arg,
         num_sensors_arg,
-        publish_rate_arg,
+        # publish_rate_arg,
         foxglove_bridge,
         robot_st_base_node,
         robot_state_publisher_node,
         pcl_node,
+        camera_node_2,
         # rviz_node
     ])
