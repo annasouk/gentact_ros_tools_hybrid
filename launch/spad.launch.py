@@ -10,12 +10,27 @@ from launch_ros.parameter_descriptions import ParameterValue
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
 
-    robot_urdf_file = PathJoinSubstitution([
-        FindPackageShare('gentact_ros_tools'),
-        'urdf',
-        'fr3_plate_rviz.urdf'
-    ])
-    robot_description = ParameterValue(Command(['cat ', robot_urdf_file]), value_type=str)
+    # Configure skin files here. '' means no skin.
+    link1_skin = ''
+    link2_skin = ''
+    link3_skin = ''
+    link4_skin = ''
+    link5_skin = '../skin/link5_spad.xacro'
+    link6_skin = ''
+
+    urdf_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'robot', 'fr3_full_skin.xacro'])
+    
+    robot_description = ParameterValue(
+        Command(['xacro ', urdf_file, 
+            # ' link1_skin:=', link1_skin, 
+            # ' link2_skin:=', link2_skin, 
+            # ' link3_skin:=', link3_skin, 
+            # ' link4_skin:=', link4_skin, 
+            ' link5_skin:=', link5_skin
+            # ' link6_skin:=', link6_skin]), 
+            ]),
+        value_type=str
+    )
 
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
@@ -58,17 +73,24 @@ def generate_launch_description():
         name='tof_talker'
     )
 
+    foxglove_bridge = Node(
+        package='foxglove_bridge',
+        executable='foxglove_bridge',
+        name='foxglove_bridge'
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
             default_value='false',
             description='Use simulation (Gazebo) clock if true'
         ),
-        TimerAction(period=0.0, actions=[rviz_node]),
-        TimerAction(period=2.0, actions=[robot_state_publisher_node]),
-        #TimerAction(period=3.0, actions=[joint_state_publisher_node]),
-        TimerAction(period=4.0, actions=[robot_st_base_node]),
-        TimerAction(period=5.0, actions=[tof_listener]),
-        TimerAction(period=6.0, actions=[pointcloud_talker]),
+        foxglove_bridge,
+        TimerAction(period=1.0, actions=[rviz_node]),
+        TimerAction(period=1.0, actions=[robot_state_publisher_node]),
+        TimerAction(period=1.0, actions=[joint_state_publisher_node]),
+        TimerAction(period=1.0, actions=[robot_st_base_node]),
+        # TimerAction(period=1.0, actions=[tof_listener]),
+        # TimerAction(period=1.0, actions=[pointcloud_talker]),
 
     ])
