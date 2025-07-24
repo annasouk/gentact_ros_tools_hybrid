@@ -9,5 +9,14 @@ ros2 launch gentact_ros_tools self-cap
 
 # To calibrate the sensor
 ```bash
-ros2 launch gentact_ros_tools calibrate_self-cap
+ros2 launch gentact_ros_tools self-cap_calibration.launch.py
 ```
+
+```bash
+noetic \
+    foxy \
+    ros2 run ros1_bridge dynamic_bridge
+```
+
+Then the controller
+# 

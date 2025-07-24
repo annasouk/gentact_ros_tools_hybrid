@@ -19,8 +19,11 @@ def generate_launch_description():
     # link6_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'link6_fancy.xacro'])
     ee_xacro_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'end_effectors', 'large_plate_ee.xacro'])
     urdf_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'robot', 'fr3_full_skin.xacro'])
-
     calibration_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'calibration', 'link5.xacro'])
+    
+    rviz_config_file = PathJoinSubstitution([
+        FindPackageShare('gentact_ros_tools'), 'config', 'self-cap-calibration.rviz'
+    ])  
     
     robot_description = ParameterValue(
         Command(['xacro ', urdf_file, 
@@ -79,12 +82,13 @@ def generate_launch_description():
         arguments=['0.5', '0', '-0.04', '0', '0', '0', 'map', 'reference_point']
     )
 
+    #ros2 run tf2_ros static_transform_publisher 0.435 0 -0.13 1.5707 0 1.78 map calibration_base
     calibration_base_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='calibration_base_node',
         output='screen',
-        arguments=['0.435', '0', '-0.13', '1.5707', '0', '1.78', 'map', 'calibration_base']
+        arguments=['0.47', '0', '-0.13', '1.5707', '0', '1.78', 'map', 'calibration_base']
     )
 
 
@@ -92,7 +96,8 @@ def generate_launch_description():
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
-        name='rviz2'
+        name='rviz2',
+        arguments=['-d', rviz_config_file]
     )
     
     # Sensor     # Declare launch arguments
@@ -133,6 +138,13 @@ def generate_launch_description():
         name='cam_pub',
     )
 
+    webcam_node = Node(
+        package='camera_tools',
+        executable='basic_camera_node',
+        name='webcam',
+        arguments=['-c', '4']
+    )
+
     foxglove_bridge_node = Node(
         package='foxglove_bridge',
         executable='foxglove_bridge',
@@ -149,15 +161,16 @@ def generate_launch_description():
         serial_port_arg,
         num_sensors_arg,
         publish_rate_arg,
-        foxglove_bridge_node,
+        # foxglove_bridge_node,
         TimerAction(period=1.0, actions=[robot_st_base_node]),
         TimerAction(period=1.0, actions=[reference_point_node]),
         TimerAction(period=1.0, actions=[calibration_base_node]),
         TimerAction(period=1.0, actions=[skin_state_publisher_node]),
         TimerAction(period=1.0, actions=[robot_state_publisher_node]),
-        TimerAction(period=1.0, actions=[joint_state_publisher_node]),
-        # TimerAction(period=1.0, actions=[rviz_node]),
-        # TimerAction(period=1.0, actions=[camera_node]),
-        # TimerAction(period=1.0, actions=[sensor_publisher_node]),
+        # TimerAction(period=1.0, actions=[joint_state_publisher_node]),
+        TimerAction(period=1.0, actions=[rviz_node]),
+        TimerAction(period=1.0, actions=[camera_node]),
+        TimerAction(period=1.0, actions=[webcam_node]),
+        TimerAction(period=1.0, actions=[sensor_publisher_node]),
 
     ])

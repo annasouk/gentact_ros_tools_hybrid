@@ -18,6 +18,7 @@ class SensorPublisher(Node):
         self.serial_port = self.get_parameter('serial_port').get_parameter_value().string_value
         self.num_sensors = self.get_parameter('num_sensors').get_parameter_value().integer_value
         self.publish_rate = self.get_parameter('publish_rate').get_parameter_value().double_value
+        self.last_data = []
         
         # Initialize publisher
         self.publisher = self.create_publisher(
