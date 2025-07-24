@@ -179,8 +179,11 @@
     <safety_controller k_position="100.0" k_velocity="40.0" soft_lower_limit="-2.8065" soft_upper_limit="2.8065"/>
     <dynamics D="1" K="7000" damping="0.003" friction="0.2" mu_coulomb="0" mu_viscous="16"/>
   </joint>
+
+  <!-- Include the skin for link5 -->
   <xacro:include filename="${link5_skin}" />
   <xacro:link5_skin parent="fr3_link5" namespace="link5" />
+
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="fr3_link6">
     <visual name="fr3_link6_visual">
@@ -208,6 +211,11 @@
     <safety_controller k_position="100.0" k_velocity="40.0" soft_lower_limit="0.5445" soft_upper_limit="4.5169"/>
     <dynamics D="1" K="7000" damping="0.003" friction="0.2" mu_coulomb="0" mu_viscous="16"/>
   </joint>
+
+  <!-- Include the skin for link6 -->
+  <xacro:include filename="${link6_skin}" />
+  <xacro:link6_skin parent="fr3_link6" namespace="link6" />
+
   <!-- sub-link defining detailed meshes for collision with environment -->
   <link name="fr3_link7">
     <visual name="fr3_link7_visual">
