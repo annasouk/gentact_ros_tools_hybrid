@@ -17,6 +17,7 @@ def generate_launch_description():
     link4_skin = ''
     link5_skin = '../skin/link5_spad.xacro'
     link6_skin = ''
+    ee_mesh_file = ''
 
     urdf_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'robot', 'fr3_full_skin.xacro'])
     
@@ -26,9 +27,10 @@ def generate_launch_description():
             # ' link2_skin:=', link2_skin, 
             # ' link3_skin:=', link3_skin, 
             # ' link4_skin:=', link4_skin, 
-            ' link5_skin:=', link5_skin
-            # ' link6_skin:=', link6_skin]), 
-            ]),
+            ' link5_skin:=', link5_skin,
+            ' link6_skin:=', link6_skin,
+            #' ee_mesh_file:=', ee_mesh_file
+            ]),  
         value_type=str
     )
 

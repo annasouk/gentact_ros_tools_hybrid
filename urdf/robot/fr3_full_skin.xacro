@@ -18,7 +18,8 @@
   <xacro:arg name="link4_skin" default=""/>
   <xacro:arg name="link5_skin" default=""/>
   <xacro:arg name="link6_skin" default=""/>
-  
+  <xacro:arg name="ee_xacro_file" default=""/>
+
   <link name="base">
       </link>
   <joint name="fr3_base_joint" type="fixed">
@@ -277,10 +278,12 @@
     <safety_controller k_position="100.0" k_velocity="40.0" soft_lower_limit="-3.0159" soft_upper_limit="3.0159"/>
     <dynamics D="1" K="7000" damping="0.003" friction="0.2" mu_coulomb="0" mu_viscous="16"/>
   </joint>
-  <link name="fr3_link8"/>
-  <joint name="fr3_joint8" type="fixed">
-    <origin rpy="0 0 0" xyz="0 0 0.107"/>
-    <parent link="fr3_link7"/>
-    <child link="fr3_link8"/>
-  </joint>
+
+  <!-- End effector -->
+  <!-- Include the end effector if specified -->
+  <xacro:property name="ee_xacro_file" value="$(arg ee_xacro_file)" />
+  <xacro:if value="${ee_xacro_file != ''}">
+    <xacro:include filename="$(arg ee_xacro_file)" />
+    <xacro:ee_macro parent="fr3_link7"/>
+  </xacro:if>
 </robot>
