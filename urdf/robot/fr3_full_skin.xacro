@@ -15,8 +15,8 @@
   <!-- <xacro:property name="link2_skin" value="package://gentact_ros_tools/urdf/skin/link2.xacro" /> -->
   <!-- <xacro:property name="link3_skin" value="package://gentact_ros_tools/urdf/skin/link3.xacro" /> -->
   <!-- <xacro:property name="link4_skin" value="package://gentact_ros_tools/urdf/skin/link4.xacro" /> -->
-  <xacro:property name="link5_skin" value="../skin/link5.xacro" />
-  <xacro:property name="link6_skin" value="../skin/link6.xacro" />
+  <xacro:property name="link5_skin" value="../skin/link5_fancy.xacro" />
+  <xacro:property name="link6_skin" value="../skin/link6_fancy.xacro" />
   <!-- <xacro:property name="link7_skin" value="package://gentact_ros_tools/urdf/skin/link7.xacro" /> -->
   
   <link name="base">

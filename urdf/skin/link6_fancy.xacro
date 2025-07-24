@@ -6,7 +6,7 @@
   <xacro:macro name="link6_skin" params="parent namespace">
     <!-- Properties -->
     <xacro:property name="use_mesh_file" value="true" />
-    <xacro:property name="mesh_file" value="package://gentact_ros_tools/meshes/skin/link6.stl" />
+    <xacro:property name="mesh_file" value="package://gentact_ros_tools/meshes/skin/link6_fancy.stl" />
     <xacro:property name="mass" value="0.3" /> <!-- [kg] -->
     <xacro:property name="body_width" value="0.3" /> <!-- [m] -->
     <xacro:property name="body_height" value="0.1" /> <!-- [m] -->
