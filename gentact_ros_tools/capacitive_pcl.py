@@ -2,7 +2,7 @@ import math
 import rclpy
 from rclpy.node import Node
 from rclpy.publisher import Publisher
-from std_msgs.msg import Int32MultiArray, Float64
+from std_msgs.msg import Int32MultiArray, Float64, Float64MultiArray
 from sensor_msgs.msg import PointCloud2, PointField
 import numpy as np
 import struct
@@ -36,16 +36,14 @@ class CapacitivePCL(Node):
             1: '6',
             2: '0',
         }
-
-
         
         # Subscribe to sensor data
-        self.subscription = self.create_subscription(
-            Int32MultiArray,
-            '/sensor_raw',
-            self.sensor_callback,
-            1
-        )
+        # self.subscription = self.create_subscription(
+        #     Int32MultiArray,
+        #     '/sensor_raw',
+        #     self.sensor_callback,
+        #     1
+        # )
 
         self.tuning_sub = self.create_subscription(
             Float64,
@@ -54,6 +52,15 @@ class CapacitivePCL(Node):
             1
         )
         self.tuning_sub  # prevent unused variable warning
+
+        self.tracking_sub = self.create_subscription(
+            Float64MultiArray,
+            '/sensor_tracking',
+            self.sensor_callback,
+            1
+        )
+        self.tracking_sub  # prevent unused variable warning
+
         # Create publishers for each sensor's pointcloud
         self.pcl_publishers = []
         for i in range(self.num_sensors):
@@ -63,6 +70,12 @@ class CapacitivePCL(Node):
                 10
             )
             self.pcl_publishers.append(publisher)
+
+        self.dist_pub = self.create_publisher(
+            Float64MultiArray,
+            '/sensor_dist',
+            1
+        )
         
         # Initialize base pointcloud pattern (small grid)
         self.base_points = self.generate_base_points()
@@ -132,18 +145,19 @@ class CapacitivePCL(Node):
             
             # Ensure we have the expected number of sensors
             num_available = min(len(sensor_values), self.num_sensors)
+            dist_values = []
             
             for i in range(num_available):
                 # Get distance value and convert to meters
                 # distance = sensor_values[i] * self.distance_scale
-                capacitance = -sensor_values[i] / (self.clock_freq * self.R[i] * 30 * math.log(0.5))
+                capacitance = -sensor_values[i] / (self.clock_freq * self.R[i] * 30.0 * math.log(0.5))
                 distance = self.alpha / capacitance
 
                 # Create pointcloud for this sensor
                 # Copy base points and offset them by the distance in Z
                 sensor_points = self.base_points.copy()
                 
-                if distance <= self.max_distance:
+                if distance <= self.max_distance and distance >= 0.0:
                     # Within range: use actual distance
                     sensor_points[:, 2] = distance
                     self.get_logger().debug(f"Sensor {i} within range: {distance:.6f}m")
@@ -151,10 +165,15 @@ class CapacitivePCL(Node):
                     # Out of range: publish at -0.2 * max_distance
                     sensor_points[:, 2] = -0.2 * self.max_distance
                     self.get_logger().debug(f"Sensor {i} out of range ({distance:.6f}m), publishing at {-0.2 * self.max_distance:.6f}m")
+                    distance = self.max_distance + 0.01
                 
                 # Create and publish pointcloud message
                 pcl_msg = self.create_pointcloud_msg(sensor_points, i)
                 self.pcl_publishers[i].publish(pcl_msg)
+
+                dist_values.append(distance)
+            dist_msg = Float64MultiArray(data=dist_values)
+            self.dist_pub.publish(dist_msg)
             
             self.get_logger().debug(f"Published pointclouds for {num_available} sensors")
             

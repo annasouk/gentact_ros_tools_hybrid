@@ -91,6 +91,39 @@ def generate_launch_description():
         output='screen'
     )
 
+    kp_arg = DeclareLaunchArgument(
+        'Kp',
+        default_value='0.1',
+        description='Proportional gain for PD controller'
+    )
+    
+    kd_arg = DeclareLaunchArgument(
+        'Kd',
+        default_value='0.01',
+        description='Derivative gain for PD controller'
+    )
+    
+    # Create the sensor tracking publisher node
+    sensor_tracking_node = Node(
+        package='gentact_ros_tools',
+        executable='sensor_tracking_pub',
+        name='sensor_tracking_publisher',
+        parameters=[{
+            'num_sensors': LaunchConfiguration('num_sensors'),
+            'Kp': LaunchConfiguration('Kp'),
+            'Kd': LaunchConfiguration('Kd'),
+        }],
+        output='screen'
+    )
+
+    tuning_node = Node(
+        package='gentact_ros_tools',
+        executable='tuner',
+        name='tuner',
+        arguments=['0.00007'],
+        output='screen'
+    )
+
     camera_node = Node(
         package='realsense2_camera',
         executable='realsense2_camera_node',
@@ -110,7 +143,7 @@ def generate_launch_description():
         parameters=[{
             'use_sim_time': use_sim_time,
             'num_sensors': LaunchConfiguration('num_sensors'),
-            'max_distance': 0.15,
+            'max_distance': 0.12,
         }],
         output='screen'
     )
@@ -125,6 +158,9 @@ def generate_launch_description():
         # baud_rate_arg,
         num_sensors_arg,
         # publish_rate_arg,
+        kp_arg,
+        kd_arg,
+        sensor_tracking_node,
         foxglove_bridge,
         robot_st_base_node,
         robot_state_publisher_node,

@@ -17,6 +17,12 @@ def generate_launch_description():
     ])
     robot_description = ParameterValue(Command(['cat ', robot_urdf_file]), value_type=str)
 
+    foxglove_bridge = Node(
+        package='foxglove_bridge',
+        executable='foxglove_bridge',
+        name='foxglove_bridge',
+    )
+
     robot_state_publisher_node = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -62,6 +68,7 @@ def generate_launch_description():
         package='camera_tools',
         executable='basic_camera_node',
         name='cam_pub_2',
+        arguments=['-c', '0']
     )
 
     return LaunchDescription([
@@ -71,9 +78,10 @@ def generate_launch_description():
             description='Use simulation (Gazebo) clock if true'
         ),
         # TimerAction(period=0.0, actions=[rviz_node]),
-        TimerAction(period=1.0, actions=[robot_state_publisher_node]),
+        TimerAction(period=1.0, actions=[foxglove_bridge]),
+        TimerAction(period=2.0, actions=[robot_state_publisher_node]),
         #TimerAction(period=3.0, actions=[joint_state_publisher_node]),
-        TimerAction(period=1.0, actions=[robot_st_base_node]),
+        TimerAction(period=3.0, actions=[robot_st_base_node]),
         # TimerAction(period=5.0, actions=[tof_listener]),
         TimerAction(period=1.0, actions=[camera_node_2]),
         # TimerAction(period=6.0, actions=[pointcloud_talker]),
