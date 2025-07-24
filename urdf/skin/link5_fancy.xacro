@@ -11,7 +11,7 @@
     <xacro:property name="body_width" value="0.3" /> <!-- [m] -->
     <xacro:property name="body_height" value="0.1" /> <!-- [m] -->
     <xacro:property name="sensor_length" value="0.05" /> <!-- [m] -->
-    <xacro:property name="sensor_radius" value="0.005" /> <!-- [m] -->
+    <xacro:property name="sensor_radius" value="0.0" /> <!-- [m] -->
 
     <!-- Included URDF Files -->
     <xacro:include filename="$(find gentact_ros_tools)/urdf/skin/self-cap-base.xacro" />
