@@ -186,7 +186,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/skin/link5.stl" scale="1 1 1"/>
+        <mesh filename="package://gentact_ros_tools/meshes/skin/self-cap/link5_fancy.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
