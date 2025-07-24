@@ -25,90 +25,75 @@
       body_height="${body_height}"
       use_mesh_file="${use_mesh_file}"
       mesh_file="${mesh_file}">
-      <inertial>
-        <mass value="${mass}" />
-        <origin xyz="0 0 0" rpy="0 0 0" />
-        <inertia ixx="0.001" ixy="0.0" ixz="0.0" iyy="0.001" iyz="0.0" izz="0.001" />
-      </inertial>
+      <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:dermis_base_macro>
 
     <!-- Instantiate sensors -->
     <xacro:self_cap_sensor
       robot_namespace="${namespace}"
-      parent="${namespace}/base_link"
+      parent="${namespace}_skin"
       sensor_number="0"
       sensor_radius="${sensor_radius}"
       sensor_length="0.057"
-      normal_x="-0.465"
-      normal_y="-0.066"
-      normal_z="0.883">
-      <origin xyz="-0.032 -0.092 0.057" rpy="0.488 0.000 -1.431" />
+      normal_x="-0.049"
+      normal_y="0.985"
+      normal_z="-0.167">
+      <origin xyz="-0.004 0.115 -0.089" rpy="-1.403 -3.142 0.049" />
     </xacro:self_cap_sensor>
     <xacro:self_cap_sensor
       robot_namespace="${namespace}"
-      parent="${namespace}/base_link"
+      parent="${namespace}_skin"
       sensor_number="1"
       sensor_radius="${sensor_radius}"
       sensor_length="0.048"
-      normal_x="-0.120"
-      normal_y="-0.740"
-      normal_z="0.661">
-      <origin xyz="-0.007 -0.131 0.048" rpy="0.848 0.000 -0.160" />
+      normal_x="-0.050"
+      normal_y="0.941"
+      normal_z="-0.335">
+      <origin xyz="-0.007 0.127 -0.038" rpy="-1.229 -3.142 0.054" />
     </xacro:self_cap_sensor>
     <xacro:self_cap_sensor
       robot_namespace="${namespace}"
-      parent="${namespace}/base_link"
+      parent="${namespace}_skin"
       sensor_number="2"
       sensor_radius="${sensor_radius}"
       sensor_length="0.060"
-      normal_x="0.276"
-      normal_y="0.006"
-      normal_z="0.961">
-      <origin xyz="0.023 -0.086 0.060" rpy="0.280 -0.000 1.591" />
+      normal_x="0.375"
+      normal_y="0.908"
+      normal_z="-0.188">
+      <origin xyz="0.026 0.130 -0.013" rpy="1.760 -0.000 2.750" />
     </xacro:self_cap_sensor>
     <xacro:self_cap_sensor
       robot_namespace="${namespace}"
-      parent="${namespace}/base_link"
+      parent="${namespace}_skin"
       sensor_number="3"
       sensor_radius="${sensor_radius}"
       sensor_length="0.059"
-      normal_x="-0.021"
-      normal_y="0.008"
-      normal_z="1.000">
-      <origin xyz="-0.002 -0.034 0.059" rpy="0.023 0.000 -1.950" />
+      normal_x="-0.230"
+      normal_y="0.956"
+      normal_z="-0.183">
+      <origin xyz="-0.016 0.104 -0.138" rpy="1.754 0.000 -2.906" />
     </xacro:self_cap_sensor>
     <xacro:self_cap_sensor
       robot_namespace="${namespace}"
-      parent="${namespace}/base_link"
+      parent="${namespace}_skin"
       sensor_number="4"
       sensor_radius="${sensor_radius}"
       sensor_length="0.059"
-      normal_x="-0.333"
-      normal_y="-0.001"
-      normal_z="0.943">
-      <origin xyz="-0.020 0.060 0.059" rpy="0.339 -0.000 -1.569" />
+      normal_x="-0.092"
+      normal_y="0.902"
+      normal_z="0.422">
+      <origin xyz="-0.007 0.133 0.023" rpy="1.136 0.000 -3.040" />
     </xacro:self_cap_sensor>
     <xacro:self_cap_sensor
       robot_namespace="${namespace}"
-      parent="${namespace}/base_link"
+      parent="${namespace}_skin"
       sensor_number="5"
       sensor_radius="${sensor_radius}"
       sensor_length="0.025"
-      normal_x="0.845"
-      normal_y="-0.481"
-      normal_z="0.235">
-      <origin xyz="0.049 -0.115 0.025" rpy="1.334 0.000 1.053" />
-    </xacro:self_cap_sensor>
-    <xacro:self_cap_sensor
-      robot_namespace="${namespace}"
-      parent="${namespace}/base_link"
-      sensor_number="6"
-      sensor_radius="${sensor_radius}"
-      sensor_length="0.023"
-      normal_x="-0.845"
-      normal_y="-0.475"
-      normal_z="0.246">
-      <origin xyz="-0.049 -0.116 0.023" rpy="1.323 0.000 -1.059" />
+      normal_x="-0.018"
+      normal_y="0.953"
+      normal_z="-0.304">
+      <origin xyz="-0.000 0.096 -0.184" rpy="-1.262 3.142 0.019" />
     </xacro:self_cap_sensor>
   </xacro:macro>
 

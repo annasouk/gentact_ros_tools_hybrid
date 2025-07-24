@@ -12,15 +12,17 @@ class SensorPublisher(Node):
         
         # Declare parameters
         self.declare_parameter('serial_port', '/dev/ttyACM0')
-        self.declare_parameter('baud_rate', 9600)
         self.declare_parameter('num_sensors', 3)
         self.declare_parameter('publish_rate', 30.0)  # Hz
         
         # Get parameters
         self.serial_port = self.get_parameter('serial_port').get_parameter_value().string_value
-        self.baud_rate = self.get_parameter('baud_rate').get_parameter_value().integer_value
         self.num_sensors = self.get_parameter('num_sensors').get_parameter_value().integer_value
         self.publish_rate = self.get_parameter('publish_rate').get_parameter_value().double_value
+        self.max_consecutive_errors = 10
+        
+        # Initialize error tracking
+        self.consecutive_errors = 0
         
         # Initialize publisher
         self.publisher = self.create_publisher(
@@ -31,7 +33,7 @@ class SensorPublisher(Node):
         
         # Initialize serial connection
         try:
-            self.serial = serial.Serial(self.serial_port, self.baud_rate)
+            self.serial = serial.Serial(self.serial_port, 9600)
             self.get_logger().info(f"Connected to serial port: {self.serial_port}")
         except serial.SerialException as e:
             self.get_logger().error(f"Failed to connect to serial port: {e}")
@@ -62,19 +64,39 @@ class SensorPublisher(Node):
                     read_numbers = np.array([int(x.strip()) for x in data_str.split(',') if x.strip()])
                     if len(read_numbers) >= self.num_sensors:
                         self.last_data = read_numbers[:self.num_sensors]
+                        # Reset error counter on successful read
+                        self.consecutive_errors = 0
                 except ValueError:
                     # Return last valid data if conversion fails
-                    pass
+                    self.consecutive_errors += 1
+                    self.get_logger().warn(f"Value conversion error. Consecutive errors: {self.consecutive_errors}")
             else:
                 # No data available, return last valid data
-                pass
+                self.consecutive_errors += 1
+                self.get_logger().warn(f"No data available. Consecutive errors: {self.consecutive_errors}")
                 
         except serial.SerialException as e:
-            self.get_logger().warn(f"Serial read error: {e}")
+            self.consecutive_errors += 1
+            self.get_logger().warn(f"Serial read error: {e}. Consecutive errors: {self.consecutive_errors}")
+            time.sleep(0.5)
+            
         except Exception as e:
-            self.get_logger().warn(f"Unexpected error reading serial: {e}")
+            self.consecutive_errors += 1
+            self.get_logger().warn(f"Unexpected error reading serial: {e}. Consecutive errors: {self.consecutive_errors}")
+            time.sleep(0.5)
+
+        # Check if we've exceeded the maximum consecutive errors
+        if self.consecutive_errors >= self.max_consecutive_errors:
+            self.get_logger().error(f"Exceeded maximum consecutive errors ({self.max_consecutive_errors}). Shutting down node.")
+            # Schedule node shutdown
+            self.create_timer(0.1, self.shutdown_node)
         
         return self.last_data
+    
+    def shutdown_node(self):
+        """Shutdown the node due to excessive errors"""
+        self.get_logger().error("Shutting down sensor publisher due to excessive errors")
+        rclpy.shutdown()
     
     def publish_sensor_data(self):
         """Read sensor data and publish as ROS2 message"""
@@ -89,7 +111,14 @@ class SensorPublisher(Node):
             # Log for debugging
             self.get_logger().debug(f"Published sensor data: {sensor_values}")
         except Exception as e:
-            self.get_logger().error(f"Error in publish_sensor_data: {e}")
+            self.consecutive_errors += 1
+            self.get_logger().error(f"Error in publish_sensor_data: {e}. Consecutive errors: {self.consecutive_errors}")
+            
+            # Check if we've exceeded the maximum consecutive errors
+            if self.consecutive_errors >= self.max_consecutive_errors:
+                self.get_logger().error(f"Exceeded maximum consecutive errors ({self.max_consecutive_errors}). Shutting down node.")
+                # Schedule node shutdown
+                self.create_timer(0.1, self.shutdown_node)
     
     def __del__(self):
         """Cleanup serial connection"""
