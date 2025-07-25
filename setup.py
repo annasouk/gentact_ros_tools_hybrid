@@ -30,6 +30,7 @@ setup(
         (os.path.join('share', package_name, 'msg'), glob('gentact_ros_tools/msg/*.msg')),
     ] + get_data_files_recursive('meshes', os.path.join('share', package_name, 'meshes')) + get_data_files_recursive('urdf', os.path.join('share', package_name, 'urdf')),
     install_requires=['setuptools'],
+    requires=['rclpy', 'std_msgs', 'sensor_msgs', 'tf2_ros', 'geometry_msgs'],
     zip_safe=True,
     maintainer='carson',
     maintainer_email='carson.kohlbrenner@gmail.com',
@@ -43,6 +44,7 @@ setup(
             'capacitive_pcl = gentact_ros_tools.capacitive_pcl:main',
             'tuner = gentact_ros_tools.tuner:main',
             'sensor_tracking_pub = gentact_ros_tools.sensor_tracking_pub:main',
+            'processor = gentact_ros_tools.processor:main',
         ],
     },
 )

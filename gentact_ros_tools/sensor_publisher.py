@@ -13,11 +13,13 @@ class SensorPublisher(Node):
         self.declare_parameter('serial_port', '/dev/ttyACM0')
         self.declare_parameter('num_sensors', 3)
         self.declare_parameter('publish_rate', 30.0)  # Hz
+        self.declare_parameter('startup_timeout', 3.0)  # seconds
         
         # Get parameters
         self.serial_port = self.get_parameter('serial_port').get_parameter_value().string_value
         self.num_sensors = self.get_parameter('num_sensors').get_parameter_value().integer_value
         self.publish_rate = self.get_parameter('publish_rate').get_parameter_value().double_value
+        self.startup_timeout = self.get_parameter('startup_timeout').get_parameter_value().double_value
         self.last_data = []
         
         # Initialize publisher
@@ -46,12 +48,18 @@ class SensorPublisher(Node):
     def wait_for_valid_reading(self):
         """Wait until we receive a valid sensor reading"""
         if self.serial is None:
-            self.get_logger().error("No serial connection available")
-            return
+            self.get_logger().error("No serial connection available. Shutting down.")
+            raise RuntimeError("Failed to connect to serial port. Cannot get sensor readings.")
             
         self.get_logger().info("Waiting for first valid sensor reading...")
         
+        start_time = self.get_clock().now()
+        
         while rclpy.ok():
+            if (self.get_clock().now() - start_time).nanoseconds / 1e9 > self.startup_timeout:
+                self.get_logger().error(f"Timeout: No valid sensor reading received within {self.startup_timeout} seconds. Shutting down.")
+                raise TimeoutError(f"Sensor reading timeout after {self.startup_timeout}s")
+
             try:
                 if self.serial.in_waiting > 0:
                     data = self.serial.readline()
