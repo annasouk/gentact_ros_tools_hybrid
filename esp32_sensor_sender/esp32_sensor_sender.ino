@@ -10,7 +10,7 @@
 
 #include <WiFi.h>
 #include <WiFiUdp.h>
-#include <CapacitiveSensor.h>
+#include <CapacitiveSensorR4.h>
 #include "credentials.hpp"
 
 // WiFi configuration (from credentials.hpp)
@@ -21,19 +21,35 @@ const char* password = WIFI_PASSWORD;
 const char* udpAddress = UDP_ADDRESS;
 const int udpPort = UDP_PORT;
 
-// Capacitive sensor configuration
-CapacitiveSensor cs_4_2 = CapacitiveSensor(4, 2);  // 10M resistor between pins 4 & 2
-CapacitiveSensor cs_4_6 = CapacitiveSensor(4, 6);  // 10M resistor between pins 4 & 6  
-CapacitiveSensor cs_4_8 = CapacitiveSensor(4, 8);  // 10M resistor between pins 4 & 8
+// USER CONFIGURATION - Define your sensors here
+// Format: {send_pin, receive_pin}
+const int SENSOR_PINS[][2] = {
+    {3, 2},   // Sensor 0
+    {3, 4},   // Sensor 1
+    {3, 5},   // Sensor 2
+    {18, 19},
+    {18, 17},
+    {18, 16},
+    // Add more sensors as needed: {send_pin, receive_pin}
+    // {3, 6},   // Sensor 3
+    // {3, 7},   // Sensor 4
+    // {3, 8},   // Sensor 5
+};
+
+// Automatically calculate number of sensors from array
+const int NUM_SENSORS = sizeof(SENSOR_PINS) / sizeof(SENSOR_PINS[0]);
+
+// Dynamic sensor array
+CapacitiveSensor* sensors[NUM_SENSORS];
 
 // WiFi and UDP objects
 WiFiUDP udp;
 
-// Sensor data structure (simplified - no timestamp)
+// Sensor data structure (adapts to number of sensors)
 struct SensorData {
   uint32_t device_id;      // 4 bytes
   uint32_t num_sensors;    // 4 bytes
-  float sensor_values[8];  // 32 bytes (max 8 sensors)
+  float sensor_values[NUM_SENSORS];  // Dynamic array
 } sensorData;
 
 void setup() {
@@ -41,12 +57,23 @@ void setup() {
     
     // Initialize sensor data structure
     sensorData.device_id = 0x00000001;  // Device ID
-    sensorData.num_sensors = 3;  // 3 capacitive sensors
+    sensorData.num_sensors = NUM_SENSORS;  // Use calculated number of sensors
     
-    // Configure capacitive sensors
-    cs_4_2.set_CS_AutocaL_Millis(0xFFFFFFFF);  // turn off autocalibrate
-    cs_4_6.set_CS_AutocaL_Millis(0xFFFFFFFF);  // turn off autocalibrate
-    cs_4_8.set_CS_AutocaL_Millis(0xFFFFFFFF);  // turn off autocalibrate
+    Serial.print("Initializing ");
+    Serial.print(NUM_SENSORS);
+    Serial.println(" sensors...");
+    
+    // Initialize capacitive sensors dynamically
+    for (int i = 0; i < NUM_SENSORS; i++) {
+        sensors[i] = new CapacitiveSensor(SENSOR_PINS[i][0], SENSOR_PINS[i][1]);
+        sensors[i]->set_CS_AutocaL_Millis(0xFFFFFFFF);  // turn off autocalibrate
+        Serial.print("Sensor ");
+        Serial.print(i);
+        Serial.print(": pins ");
+        Serial.print(SENSOR_PINS[i][0]);
+        Serial.print(", ");
+        Serial.println(SENSOR_PINS[i][1]);
+    }
     
     // Connect to WiFi
     WiFi.begin(ssid, password);
@@ -70,14 +97,12 @@ void setup() {
 void loop() {
     // Read capacitive sensor values
     long start = millis();
-    long total1 = cs_4_2.capacitiveSensor(30);
-    long total2 = cs_4_6.capacitiveSensor(30);
-    long total3 = cs_4_8.capacitiveSensor(30);
     
-    // Store raw capacitive sensor values directly
-    sensorData.sensor_values[0] = (float) total1;
-    sensorData.sensor_values[1] = (float) total2;
-    sensorData.sensor_values[2] = (float) total3;
+    // Read all sensors dynamically
+    for (int i = 0; i < NUM_SENSORS; i++) {
+        long sensorValue = sensors[i]->capacitiveSensor(30);
+        sensorData.sensor_values[i] = (float) sensorValue;
+    }
     
     // Send data via UDP
     udp.beginPacket(udpAddress, udpPort);
@@ -88,11 +113,11 @@ void loop() {
     Serial.print("Performance: ");
     Serial.print(millis() - start);
     Serial.print("ms | Sent: ");
-    Serial.print(total1);
-    Serial.print(" ");
-    Serial.print(total2);
-    Serial.print(" ");
-    Serial.println(total3);
+    for (int i = 0; i < NUM_SENSORS; i++) {
+        Serial.print(sensorData.sensor_values[i]);
+        if (i < NUM_SENSORS - 1) Serial.print(" ");
+    }
+    Serial.println();
     
     delay(10);  // 100 Hz update rate (matching original code)
 } 
