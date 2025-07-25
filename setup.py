@@ -43,6 +43,7 @@ setup(
             'capacitive_pcl = gentact_ros_tools.capacitive_pcl:main',
             'tuner = gentact_ros_tools.tuner:main',
             'sensor_tracking_pub = gentact_ros_tools.sensor_tracking_pub:main',
+            'udp_sensor_receiver = gentact_ros_tools.udp_sensor_receiver:main',
         ],
     },
 )
