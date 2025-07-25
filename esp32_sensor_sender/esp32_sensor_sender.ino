@@ -1,14 +1,25 @@
+/*
+ * ESP32 Capacitive Sensor UDP Sender
+ * 
+ * Make sure to create credentials.hpp with your WiFi credentials:
+ * - WIFI_SSID
+ * - WIFI_PASSWORD  
+ * - UDP_ADDRESS
+ * - UDP_PORT
+ */
+
 #include <WiFi.h>
 #include <WiFiUdp.h>
 #include <CapacitiveSensor.h>
+#include "credentials.hpp"
 
-// WiFi configuration
-const char* ssid = "YOUR_WIFI_SSID";
-const char* password = "YOUR_WIFI_PASSWORD";
+// WiFi configuration (from credentials.hpp)
+const char* ssid = WIFI_SSID;
+const char* password = WIFI_PASSWORD;
 
-// UDP configuration
-const char* udpAddress = "192.168.1.100";  // Change to your ROS2 machine IP
-const int udpPort = 8888;
+// UDP configuration (from credentials.hpp)
+const char* udpAddress = UDP_ADDRESS;
+const int udpPort = UDP_PORT;
 
 // Capacitive sensor configuration
 CapacitiveSensor cs_4_2 = CapacitiveSensor(4, 2);  // 10M resistor between pins 4 & 2
