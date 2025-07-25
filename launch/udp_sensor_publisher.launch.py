@@ -6,8 +6,8 @@ def generate_launch_description():
     return LaunchDescription([
         Node(
             package='gentact_ros_tools',
-            executable='udp_sensor_receiver',
-            name='udp_sensor_receiver',
+            executable='udp_sensor_publisher',
+            name='udp_sensor_publisher',
             output='screen',
             parameters=[{
                 'udp_port': 8888,

@@ -8,9 +8,9 @@ import time
 import numpy as np
 
 
-class UDPSensorReceiver(Node):
+class UDPSensorPublisher(Node):
     def __init__(self):
-        super().__init__('udp_sensor_receiver')
+        super().__init__('udp_sensor_publisher')
         
         # Declare parameters
         self.declare_parameter('udp_port', 8888)
@@ -48,7 +48,7 @@ class UDPSensorReceiver(Node):
         # Create timer for status updates
         self.status_timer = self.create_timer(5.0, self._status_update)
         
-        self.get_logger().info(f"UDP Sensor Receiver started on port {self.udp_port}")
+        self.get_logger().info(f"UDP Sensor Publisher started on port {self.udp_port}")
     
     def _receive_loop(self):
         """Main receive loop running in separate thread"""
@@ -157,14 +157,14 @@ class UDPSensorReceiver(Node):
 def main(args=None):
     rclpy.init(args=args)
     
-    receiver = UDPSensorReceiver()
+    publisher = UDPSensorPublisher()
     
     try:
-        rclpy.spin(receiver)
+        rclpy.spin(publisher)
     except KeyboardInterrupt:
         pass
     finally:
-        receiver.destroy_node()
+        publisher.destroy_node()
         rclpy.shutdown()
 
 
