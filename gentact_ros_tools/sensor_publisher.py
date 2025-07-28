@@ -14,18 +14,27 @@ class SensorPublisher(Node):
         self.declare_parameter('num_sensors', 3)
         self.declare_parameter('publish_rate', 30.0)  # Hz
         self.declare_parameter('startup_timeout', 3.0)  # seconds
+        self.declare_parameter('calibration_duration', 3.0)  # seconds
         
         # Get parameters
         self.serial_port = self.get_parameter('serial_port').get_parameter_value().string_value
         self.num_sensors = self.get_parameter('num_sensors').get_parameter_value().integer_value
         self.publish_rate = self.get_parameter('publish_rate').get_parameter_value().double_value
         self.startup_timeout = self.get_parameter('startup_timeout').get_parameter_value().double_value
+        self.calibration_duration = self.get_parameter('calibration_duration').get_parameter_value().double_value
         self.last_data = []
+        self.baseline_data = None
         
         # Initialize publisher
         self.publisher = self.create_publisher(
             Int32MultiArray, 
             '/sensor_raw', 
+            1
+        )
+
+        self.baseline_pub = self.create_publisher(
+            Int32MultiArray,
+            '/sensor_baseline',
             1
         )
         
@@ -39,11 +48,70 @@ class SensorPublisher(Node):
         
         # Wait for first valid reading before starting
         self.wait_for_valid_reading()
+
+        # Perform calibration to get baseline values
+        self.perform_calibration()
         
         # Create timer for publishing
         self.timer = self.create_timer(1.0 / self.publish_rate, self.publish_sensor_data)
         
         self.get_logger().info("Sensor publisher initialized and ready")
+    
+    def perform_calibration(self):
+        """Collect sensor data for 3 seconds and calculate baseline average"""
+        if self.serial is None:
+            self.get_logger().error("No serial connection available for calibration.")
+            return
+            
+        self.get_logger().info(f"Starting calibration for {self.calibration_duration} seconds...")
+        
+        calibration_data = []
+        start_time = self.get_clock().now()
+        
+        while rclpy.ok():
+            current_time = self.get_clock().now()
+            elapsed_time = (current_time - start_time).nanoseconds / 1e9
+            
+            if elapsed_time >= self.calibration_duration:
+                break
+                
+            try:
+                if self.serial.in_waiting > 0:
+                    data = self.serial.readline()
+                    data_str = data.decode('utf-8').strip()
+                    
+                    # Try to parse the data
+                    try:
+                        read_numbers = np.array([int(x.strip()) for x in data_str.split(',') if x.strip()])
+                        if len(read_numbers) >= self.num_sensors:
+                            calibration_data.append(read_numbers[:self.num_sensors])
+                    except ValueError:
+                        # Invalid data, continue
+                        continue
+                        
+            except serial.SerialException as e:
+                self.get_logger().warn(f"Serial error during calibration: {e}")
+                continue
+            except Exception as e:
+                self.get_logger().warn(f"Unexpected error during calibration: {e}")
+                continue
+        
+        if calibration_data:
+            # Calculate average of all collected data
+            calibration_array = np.array(calibration_data)
+            self.baseline_data = np.mean(calibration_array, axis=0).astype(int)
+            
+            self.get_logger().info(f"Calibration complete. Baseline values: {self.baseline_data}")
+            self.get_logger().info(f"Collected {len(calibration_data)} samples during calibration")
+            
+            # Publish baseline data
+            baseline_msg = Int32MultiArray()
+            baseline_msg.data = self.baseline_data.tolist()
+            self.baseline_pub.publish(baseline_msg)
+            self.get_logger().info("Published baseline calibration data")
+        else:
+            self.get_logger().error("No valid data collected during calibration")
+            self.baseline_data = np.zeros(self.num_sensors, dtype=int)
     
     def wait_for_valid_reading(self):
         """Wait until we receive a valid sensor reading"""
