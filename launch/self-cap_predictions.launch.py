@@ -140,10 +140,10 @@ def generate_launch_description():
         name='ee_prediction_model_mamba',
         output='screen',
         parameters=[{
-            'model_path': PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'config', 'mamba_model.pth'])
+            'model_path': PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'config', 'mamba_model_l5.pth'])
         }]
     )
-    
+
     foxglove_bridge_node = Node(
         package='foxglove_bridge',
         executable='foxglove_bridge',

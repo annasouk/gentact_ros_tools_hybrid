@@ -1,3 +1,4 @@
+#!/home/carson/ros2_ws/venv/bin/python3
 # This is a machine learning model that predicts the end effector position of a robot arm based on the sensor data.
 import rclpy
 from rclpy.node import Node
@@ -67,6 +68,13 @@ class MambaModel(nn.Module):
 class EEPredictionModelNode(Node):
     def __init__(self):
         super().__init__('ee_prediction_model')
+
+        if torch.cuda.is_available():
+            self.device = torch.device("cuda")
+            print("GPU is available and will be used.")
+        else:
+            self.device = torch.device("cpu")
+            print("GPU is not available, using CPU.")
         
         # Initialize default model parameters
         self.hidden_size = 64
@@ -90,7 +98,7 @@ class EEPredictionModelNode(Node):
                 torch.serialization.add_safe_globals([StandardScaler])
                 
                 # Load with weights_only=False for backward compatibility
-                checkpoint = torch.load(model_path, map_location='cpu', weights_only=False)
+                checkpoint = torch.load(model_path, map_location=self.device, weights_only=False)
                 
                 # Load model configuration from checkpoint
                 self.scaler_X = checkpoint.get('scaler_X')
@@ -112,6 +120,8 @@ class EEPredictionModelNode(Node):
                     expand=self.expand,
                     num_layers=self.num_layers
                 )
+
+                self.model.to(self.device)
                 
                 # Load trained weights
                 self.model.load_state_dict(checkpoint['model_state_dict'])
@@ -137,7 +147,7 @@ class EEPredictionModelNode(Node):
         )
         self.prediction_pub = self.create_publisher(
             PointCloud2,
-            '/ee_prediction',
+            '/ee_mamba_prediction',
             1
         )
         self.get_logger().info('EE Prediction Model Node Initialized')
@@ -161,7 +171,8 @@ class EEPredictionModelNode(Node):
             # Fallback to simple normalization if no scaler is available
             sensor_data = (sensor_data - sensor_data.mean()) / (sensor_data.std() + 1e-8)
         
-        sensor_data = torch.tensor(sensor_data, dtype=torch.float32).unsqueeze(0)
+        # Move tensor to the same device as the model
+        sensor_data = torch.tensor(sensor_data, dtype=torch.float32).unsqueeze(0).to(self.device)
         
         # Predict the end effector position
         with torch.no_grad():
@@ -170,16 +181,16 @@ class EEPredictionModelNode(Node):
                 
                 # Apply inverse scaling to get actual coordinates
                 if self.scaler_y is not None:
-                    prediction_np = prediction.numpy()
+                    prediction_np = prediction.cpu().numpy()
                     prediction_unscaled = self.scaler_y.inverse_transform(prediction_np)
-                    prediction = torch.tensor(prediction_unscaled, dtype=torch.float32)
+                    prediction = torch.tensor(prediction_unscaled, dtype=torch.float32).to(self.device)
                 
             except Exception as e:
                 self.get_logger().error(f'Error making prediction: {e}')
                 return
         
         # Convert the prediction to a PointCloud2 message
-        point_cloud_msg = self._create_pointcloud2_message(prediction[0].numpy())
+        point_cloud_msg = self._create_pointcloud2_message(prediction[0].cpu().numpy())
         
         self.prediction_pub.publish(point_cloud_msg)
         self.get_logger().debug(f'Published prediction: x={prediction[0, 0]:.3f}, y={prediction[0, 1]:.3f}, z={prediction[0, 2]:.3f}')
