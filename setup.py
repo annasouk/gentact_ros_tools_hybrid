@@ -45,6 +45,8 @@ setup(
             'tuner = gentact_ros_tools.tuner:main',
             'sensor_tracking_pub = gentact_ros_tools.sensor_tracking_pub:main',
             'processor = gentact_ros_tools.processor:main',
+            'panda2fr3 = gentact_ros_tools.panda2fr3:main',
+            'fake_obj_pub = gentact_ros_tools.fake_obj_pub:main',
         ],
     },
 )
