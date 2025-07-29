@@ -1,0 +1,8 @@
+geometry_msgs
+rclpy
+sensor_msgs
+setuptools
+std_msgs
+tf2_ros
+tf_transformations
+trac_ik_python

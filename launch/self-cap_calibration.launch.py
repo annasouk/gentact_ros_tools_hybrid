@@ -82,16 +82,14 @@ def generate_launch_description():
         arguments=['0.5', '0', '-0.04', '0', '0', '0', 'map', 'reference_point']
     )
 
-    #ros2 run tf2_ros static_transform_publisher 0.435 0 -0.13 1.5707 0 1.78 map calibration_base
+    #ros2 run tf2_ros static_transform_publisher 0.47 0 -0.13 1.5707 0 1.78 map calibration_base
     calibration_base_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='calibration_base_node',
         output='screen',
-        arguments=['0.47', '0', '-0.13', '1.5707', '0', '1.78', 'map', 'calibration_base']
+        arguments=['0.475', '-0.005', '-0.127', '1.5707', '0', '1.8', 'map', 'calibration_base']
     )
-
-
 
     rviz_node = Node(
         package='rviz2',
@@ -172,5 +170,5 @@ def generate_launch_description():
         TimerAction(period=1.0, actions=[camera_node]),
         TimerAction(period=1.0, actions=[webcam_node]),
         TimerAction(period=1.0, actions=[sensor_publisher_node]),
-
+        # TimerAction(period=2.0, actions=[ee_prediction_model_node]),
     ])

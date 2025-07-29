@@ -108,6 +108,13 @@ def generate_launch_description():
         output='screen',
     )
 
+    ee_prediction_model_node = Node(
+        package='gentact_ros_tools',
+        executable='ee_prediction_model1',
+        name='ee_prediction_model1',
+        output='screen',
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
@@ -124,5 +131,5 @@ def generate_launch_description():
         # TimerAction(period=1.0, actions=[rviz_node]),
         # TimerAction(period=1.0, actions=[camera_node]),
         TimerAction(period=1.0, actions=[sensor_publisher_node]),
-
+        
     ])

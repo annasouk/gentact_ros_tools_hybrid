@@ -5,10 +5,13 @@ from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitut
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.parameter_descriptions import ParameterValue
+import json
+import os
 
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    json_file = LaunchConfiguration('json_file')
 
     # Configure skin files here. '' means no skin.
     # link1_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'skin.xacro'])
@@ -75,13 +78,16 @@ def generate_launch_description():
         arguments=['0.5', '0', '-0.04', '0', '0', '0', 'map', 'reference_point']
     )
 
+    # Default pose values
+    default_pose = ['0.475', '-0.005', '-0.127', '1.5707', '0', '1.8']
+    
     #ros2 run tf2_ros static_transform_publisher 0.47 0 -0.13 1.5707 0 1.78 map calibration_base
     calibration_base_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='calibration_base_node',
         output='screen',
-        arguments=['0.47', '0', '-0.13', '1.5707', '0', '1.78', 'map', 'calibration_base']
+        arguments=default_pose + ['map', 'calibration_base']
     )
 
     rviz_node = Node(
@@ -97,6 +103,12 @@ def generate_launch_description():
         description='Number of sensors'
     )
 
+    json_file_arg = DeclareLaunchArgument(
+        'json_file',
+        default_value='',
+        description='Path to JSON file containing pose values for calibration base'
+    )
+
     processor_node = Node(
         package='gentact_ros_tools',
         executable='processor',
@@ -105,11 +117,67 @@ def generate_launch_description():
         parameters=[{'num_sensors': LaunchConfiguration('num_sensors')}],
     )   
 
+    training_data_processor_node = Node(
+        package='gentact_ros_tools',
+        executable='training_data_processor',
+        name='training_data_processor',
+        output='screen',
+    )
+
+    ee_prediction_model_node = Node(
+        package='gentact_ros_tools',
+        executable='ee_prediction_model1',
+        name='ee_prediction_model1',
+        output='screen',
+        parameters=[{
+            'model_path': PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'config', 'mlp_model.pth'])
+        }]
+    )
+
     foxglove_bridge_node = Node(
         package='foxglove_bridge',
         executable='foxglove_bridge',
         name='foxglove_bridge',
         output='screen',
+    )
+
+        # Declare launch arguments
+    declare_csv_path = DeclareLaunchArgument(
+        'csv_path',
+        default_value='/home/carson/datasets/self-cap/calibration_tests/sphere_calibrations/link5_3/training_data.csv',
+        description='Path to training data CSV file'
+    )
+    
+    declare_frame_id = DeclareLaunchArgument(
+        'frame_id',
+        default_value='calibration_skin',
+        description='Frame ID for publishing point cloud'
+    )
+    
+    declare_publish_rate = DeclareLaunchArgument(
+        'publish_rate',
+        default_value='1.0',
+        description='Publishing rate in Hz'
+    )
+    
+    declare_publish_all = DeclareLaunchArgument(
+        'publish_all_points',
+        default_value='true',
+        description='Publish all points at once (true) or one by one (false)'
+    )
+    
+    # Create the training data publisher node
+    training_data_node = Node(
+        package='gentact_ros_tools',
+        executable='ee_prediction_verifier',
+        name='training_data_publisher',
+        output='screen',
+        parameters=[{
+            'csv_path': LaunchConfiguration('csv_path'),
+            'frame_id': LaunchConfiguration('frame_id'),
+            'publish_rate': LaunchConfiguration('publish_rate'),
+            'publish_all_points': LaunchConfiguration('publish_all_points'),
+        }]
     )
 
     return LaunchDescription([
@@ -119,11 +187,19 @@ def generate_launch_description():
             description='Use simulation (Gazebo) clock if true'
         ),
         num_sensors_arg,
+        json_file_arg,
+        declare_csv_path,
+        declare_frame_id,
+        declare_publish_rate,
+        declare_publish_all,
         foxglove_bridge_node,
         TimerAction(period=1.0, actions=[robot_st_base_node]),
         TimerAction(period=1.0, actions=[reference_point_node]),
         TimerAction(period=1.0, actions=[calibration_base_node]),
         TimerAction(period=1.0, actions=[skin_state_publisher_node]),
         TimerAction(period=1.0, actions=[robot_state_publisher_node]),
-        TimerAction(period=1.0, actions=[processor_node]),
+        # TimerAction(period=1.0, actions=[processor_node]),
+        TimerAction(period=1.0, actions=[training_data_processor_node]),
+        # TimerAction(period=2.0, actions=[ee_prediction_model_node]),
+        # TimerAction(period=3.0, actions=[training_data_node]),
     ])
