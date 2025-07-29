@@ -5,10 +5,13 @@ from launch.substitutions import Command, LaunchConfiguration, PathJoinSubstitut
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
 from launch_ros.parameter_descriptions import ParameterValue
+import json
+import os
 
 
 def generate_launch_description():
     use_sim_time = LaunchConfiguration('use_sim_time', default='false')
+    json_file = LaunchConfiguration('json_file')
 
     # Configure skin files here. '' means no skin.
     # link1_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'skin.xacro'])
@@ -17,7 +20,7 @@ def generate_launch_description():
     # link4_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'skin.xacro'])
     # link5_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'link5_fancy.xacro'])
     # link6_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'link6_fancy.xacro'])
-    ee_xacro_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'end_effectors', 'large_plate_ee.xacro'])
+    ee_xacro_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'end_effectors', 'sphere_ee.xacro'])
     urdf_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'robot', 'fr3_full_skin.xacro'])
     calibration_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'calibration', 'link5.xacro'])
     
@@ -59,13 +62,6 @@ def generate_launch_description():
         ]
     )
 
-    joint_state_publisher_node = Node(
-        package='joint_state_publisher_gui',
-        executable='joint_state_publisher_gui',
-        name='fr3_joint_state_publisher',
-        output='screen'
-    )
-
     robot_st_base_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -82,13 +78,16 @@ def generate_launch_description():
         arguments=['0.5', '0', '-0.04', '0', '0', '0', 'map', 'reference_point']
     )
 
+    # Default pose values
+    default_pose = ['0.475', '-0.005', '-0.127', '1.5707', '0', '1.8']
+    
     #ros2 run tf2_ros static_transform_publisher 0.47 0 -0.13 1.5707 0 1.78 map calibration_base
     calibration_base_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='calibration_base_node',
         output='screen',
-        arguments=['0.475', '-0.005', '-0.127', '1.5707', '0', '1.8', 'map', 'calibration_base']
+        arguments=default_pose + ['map', 'calibration_base']
     )
 
     rviz_node = Node(
@@ -97,50 +96,52 @@ def generate_launch_description():
         name='rviz2',
         arguments=['-d', rviz_config_file]
     )
-    
-    # Sensor     # Declare launch arguments
-    serial_port_arg = DeclareLaunchArgument(
-        'serial_port',
-        default_value='/dev/ttyACM0',
-        description='Serial port for sensor data'
-    )
-    
+
     num_sensors_arg = DeclareLaunchArgument(
         'num_sensors',
         default_value='6',
         description='Number of sensors'
     )
-    
-    publish_rate_arg = DeclareLaunchArgument(
-        'publish_rate',
-        default_value='30.0',
-        description='Publishing rate in Hz'
+
+    json_file_arg = DeclareLaunchArgument(
+        'json_file',
+        default_value='',
+        description='Path to JSON file containing pose values for calibration base'
     )
 
-    # Create the sensor publisher node
-    sensor_publisher_node = Node(
+    processor_node = Node(
         package='gentact_ros_tools',
-        executable='sensor_publisher',
-        name='sensor_publisher',
+        executable='processor',
+        name='processor',
+        output='screen',
+        parameters=[{'num_sensors': LaunchConfiguration('num_sensors')}],
+    )   
+
+    training_data_processor_node = Node(
+        package='gentact_ros_tools',
+        executable='training_data_processor',
+        name='training_data_processor',
+        output='screen',
+    )
+
+    ee_prediction_model_node = Node(
+        package='gentact_ros_tools',
+        executable='ee_prediction_model_mlp',
+        name='ee_prediction_model_mlp',
+        output='screen',
         parameters=[{
-            'serial_port': LaunchConfiguration('serial_port'),
-            'num_sensors': LaunchConfiguration('num_sensors'),
-            'publish_rate': LaunchConfiguration('publish_rate'),
-        }],
-        output='screen'
+            'model_path': PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'config', 'mlp_model.pth'])
+        }]
     )
 
-    camera_node = Node(
-        package='realsense2_camera',
-        executable='realsense2_camera_node',
-        name='cam_pub',
-    )
-
-    webcam_node = Node(
-        package='camera_tools',
-        executable='basic_camera_node',
-        name='webcam',
-        arguments=['-c', '4']
+    ee_prediction_model_mamba_node = Node(
+        package='gentact_ros_tools',
+        executable='ee_prediction_model_mamba',
+        name='ee_prediction_model_mamba',
+        output='screen',
+        parameters=[{
+            'model_path': PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'config', 'mamba_model_l5.pth'])
+        }]
     )
 
     foxglove_bridge_node = Node(
@@ -150,25 +151,66 @@ def generate_launch_description():
         output='screen',
     )
 
+        # Declare launch arguments
+    declare_csv_path = DeclareLaunchArgument(
+        'csv_path',
+        default_value='/home/carson/datasets/self-cap/calibration_tests/sphere_calibrations/link5_3/training_data.csv',
+        description='Path to training data CSV file'
+    )
+    
+    declare_frame_id = DeclareLaunchArgument(
+        'frame_id',
+        default_value='calibration_skin',
+        description='Frame ID for publishing point cloud'
+    )
+    
+    declare_publish_rate = DeclareLaunchArgument(
+        'publish_rate',
+        default_value='1.0',
+        description='Publishing rate in Hz'
+    )
+    
+    declare_publish_all = DeclareLaunchArgument(
+        'publish_all_points',
+        default_value='true',
+        description='Publish all points at once (true) or one by one (false)'
+    )
+    
+    # Create the training data publisher node
+    training_data_node = Node(
+        package='gentact_ros_tools',
+        executable='ee_prediction_verifier',
+        name='training_data_publisher',
+        output='screen',
+        parameters=[{
+            'csv_path': LaunchConfiguration('csv_path'),
+            'frame_id': LaunchConfiguration('frame_id'),
+            'publish_rate': LaunchConfiguration('publish_rate'),
+            'publish_all_points': LaunchConfiguration('publish_all_points'),
+        }]
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
             default_value='false',
             description='Use simulation (Gazebo) clock if true'
         ),
-        serial_port_arg,
         num_sensors_arg,
-        publish_rate_arg,
-        # foxglove_bridge_node,
+        json_file_arg,
+        declare_csv_path,
+        declare_frame_id,
+        declare_publish_rate,
+        declare_publish_all,
+        foxglove_bridge_node,
         TimerAction(period=1.0, actions=[robot_st_base_node]),
         TimerAction(period=1.0, actions=[reference_point_node]),
         TimerAction(period=1.0, actions=[calibration_base_node]),
         TimerAction(period=1.0, actions=[skin_state_publisher_node]),
         TimerAction(period=1.0, actions=[robot_state_publisher_node]),
-        # TimerAction(period=1.0, actions=[joint_state_publisher_node]),
-        TimerAction(period=1.0, actions=[rviz_node]),
-        TimerAction(period=1.0, actions=[camera_node]),
-        TimerAction(period=1.0, actions=[webcam_node]),
-        TimerAction(period=1.0, actions=[sensor_publisher_node]),
-        # TimerAction(period=2.0, actions=[ee_prediction_model_node]),
+        # TimerAction(period=1.0, actions=[processor_node]),
+        # TimerAction(period=1.0, actions=[training_data_processor_node]),
+        TimerAction(period=2.0, actions=[ee_prediction_model_node]),
+        TimerAction(period=2.0, actions=[ee_prediction_model_mamba_node]),
+        TimerAction(period=3.0, actions=[training_data_node]),
     ])
