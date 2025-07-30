@@ -8,11 +8,14 @@ import torch
 import torch.nn as nn
 from std_msgs.msg import Int32MultiArray
 from sensor_msgs.msg import PointCloud2, PointField
+from geometry_msgs.msg import PoseStamped
 from ament_index_python.packages import get_package_share_directory
 import struct
 from sklearn.preprocessing import StandardScaler
 from mamba_ssm import Mamba
-
+import tf2_ros
+from tf2_ros import TransformException
+import geometry_msgs.msg
 
 class MambaModel(nn.Module):
     def __init__(self, input_size=6, hidden_size=64, output_size=3, 
@@ -84,6 +87,9 @@ class EEPredictionModelNode(Node):
         self.expand = 2
         self.num_layers = 2
         self.input_size = 6  # Default input size
+
+        self.tf_buffer = tf2_ros.Buffer()
+        self.tf_listener = tf2_ros.TransformListener(self.tf_buffer, self)
         
         # Load model from the trained .pth file
         # Use ROS2 parameter system with proper package path
@@ -152,6 +158,11 @@ class EEPredictionModelNode(Node):
             '/ee_mamba_prediction',
             1
         )
+        self.avoidance_obstacle_pub = self.create_publisher(
+            PoseStamped,
+            '/obstacle',
+            1
+        )
         self.get_logger().info('EE Prediction Model Node Initialized')
     
     def prediction_callback(self, msg: Int32MultiArray):
@@ -175,6 +186,13 @@ class EEPredictionModelNode(Node):
         
         # Move tensor to the same device as the model
         sensor_data = torch.tensor(sensor_data, dtype=torch.float32).unsqueeze(0).to(self.device)
+
+        # Transform the point from sensor frame to map frame
+        map_transform = self.tf_buffer.lookup_transform(
+            'map',
+            self.sensor_frame_id,
+            rclpy.time.Time()
+        )
         
         # Predict the end effector position
         with torch.no_grad():
@@ -191,18 +209,55 @@ class EEPredictionModelNode(Node):
                 self.get_logger().error(f'Error making prediction: {e}')
                 return
         
-        # Convert the prediction to a PointCloud2 message
-        point_cloud_msg = self._create_pointcloud2_message(prediction[0].cpu().numpy())
+        # Transform the predicted point from sensor frame to map frame
+        predicted_point = prediction[0].cpu().numpy()
+        transformed_point = self._transform_point(predicted_point, map_transform)
         
+        # Convert the prediction to a PointCloud2 message
+        point_cloud_msg = self._create_pointcloud2_message(transformed_point)
+        obstacle_msg = self._create_obstacle_message(transformed_point)
         self.prediction_pub.publish(point_cloud_msg)
+        self.avoidance_obstacle_pub.publish(obstacle_msg)
         self.get_logger().debug(f'Published prediction: x={prediction[0, 0]:.3f}, y={prediction[0, 1]:.3f}, z={prediction[0, 2]:.3f}')
+    
+    def _transform_point(self, point, transform):
+        """Transform a point from sensor frame to map frame using rotation and translation."""
+        # Extract quaternion and translation from transform
+        q = transform.transform.rotation
+        t = transform.transform.translation
+        
+        # Convert quaternion to rotation matrix manually
+        # Quaternion components: [w, x, y, z]
+        w, x, y, z = q.w, q.x, q.y, q.z
+        
+        # Normalize quaternion
+        norm = np.sqrt(w*w + x*x + y*y + z*z)
+        w, x, y, z = w/norm, x/norm, y/norm, z/norm
+        
+        # Rotation matrix from quaternion
+        rotation_matrix = np.array([
+            [1 - 2*y*y - 2*z*z,     2*x*y - 2*w*z,     2*x*z + 2*w*y],
+            [    2*x*y + 2*w*z, 1 - 2*x*x - 2*z*z,     2*y*z - 2*w*x],
+            [    2*x*z - 2*w*y,     2*y*z + 2*w*x, 1 - 2*x*x - 2*y*y]
+        ])
+        
+        # Apply rotation first, then translation
+        rotated_point = rotation_matrix @ point
+        transformed_point = rotated_point + np.array([t.x, t.y, t.z])
+        
+        return transformed_point
     
     def _create_pointcloud2_message(self, point):
         """Create a PointCloud2 message from a single 3D point."""
         # Create the point cloud message
         msg = PointCloud2()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = self.sensor_frame_id  # Adjust frame_id as needed
+        msg.header.frame_id = 'map'  # Publish in map frame since point is already transformed
+
+        # Use the already transformed point
+        px = point[0]
+        py = point[1]
+        pz = point[2]
         
         # Define the point fields (x, y, z)
         msg.fields = [
@@ -219,9 +274,25 @@ class EEPredictionModelNode(Node):
         msg.is_dense = True
         
         # Pack the point data
-        point_data = struct.pack('fff', point[0], point[1], point[2])
+        point_data = struct.pack('fff', px, py, pz)
         msg.data = point_data
         
+        return msg
+
+    def _create_obstacle_message(self, point):
+        """Create an obstacle message from a single 3D point."""
+        msg = PoseStamped()
+        msg.header.stamp = self.get_clock().now().to_msg()
+        msg.header.frame_id = 'map'  # Always publish in 'map' frame
+
+        # Use the already transformed point
+        msg.pose.position.x = float(point[0])
+        msg.pose.position.y = float(point[1])
+        msg.pose.position.z = float(point[2])
+        msg.pose.orientation.x = 0.0
+        msg.pose.orientation.y = 0.0
+        msg.pose.orientation.z = 0.0
+        msg.pose.orientation.w = 1.0
         return msg
 
 def main(args=None):
