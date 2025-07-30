@@ -89,7 +89,9 @@ class EEPredictionModelNode(Node):
         # Use ROS2 parameter system with proper package path
         default_model_path = os.path.join(get_package_share_directory('gentact_ros_tools'), 'config', 'mlp_model.pth')
         self.declare_parameter('model_path', default_model_path)
+        self.declare_parameter('sensor_frame_id', 'calibration_skin')
         model_path = self.get_parameter('model_path').get_parameter_value().string_value
+        self.sensor_frame_id = self.get_parameter('sensor_frame_id').get_parameter_value().string_value
         
         # Load the trained model and configuration
         if os.path.exists(model_path):
@@ -200,7 +202,7 @@ class EEPredictionModelNode(Node):
         # Create the point cloud message
         msg = PointCloud2()
         msg.header.stamp = self.get_clock().now().to_msg()
-        msg.header.frame_id = "calibration_skin"  # Adjust frame_id as needed
+        msg.header.frame_id = self.sensor_frame_id  # Adjust frame_id as needed
         
         # Define the point fields (x, y, z)
         msg.fields = [
