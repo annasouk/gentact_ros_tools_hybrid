@@ -40,6 +40,19 @@ def generate_launch_description():
         }]
     )
 
+    capacitive_pcl_node = Node(
+        package='gentact_ros_tools',
+        executable='capacitive_pcl',
+        name='capacitive_pcl',
+        output='screen',
+        parameters=[{
+            'num_sensors': 6,
+            'max_distance': 0.1,
+            'sensor_config': PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'config', 'link5_sphere_1.json']),
+            'frame_id': 'link5',
+        }],
+    )
+
 
     return LaunchDescription([
         DeclareLaunchArgument(
@@ -49,6 +62,7 @@ def generate_launch_description():
         ),
         # foxglove_bridge_node,
         # ee_prediction_model_node,
-        ee_prediction_model_mamba_node,
+        # ee_prediction_model_mamba_node,
+        TimerAction(period=1.0, actions=[capacitive_pcl_node]),
 
     ])

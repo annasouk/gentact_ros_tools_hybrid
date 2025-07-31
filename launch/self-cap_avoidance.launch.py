@@ -15,14 +15,14 @@ def generate_launch_description():
     # link2_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'skin.xacro'])
     # link3_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'skin.xacro'])
     # link4_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'skin.xacro'])
-    # link5_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'link5_fancy.xacro'])
-    # link6_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'link6_fancy.xacro'])
-    ee_xacro_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'end_effectors', 'large_plate_ee.xacro'])
+    link5_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'link5_fancy.xacro'])
+    link6_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'link6_fancy.xacro'])
+    ee_xacro_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'end_effectors', 'sphere_ee.xacro'])
     urdf_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'robot', 'fr3_full_skin.xacro'])
     calibration_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'calibration', 'link5.xacro'])
     
     rviz_config_file = PathJoinSubstitution([
-        FindPackageShare('gentact_ros_tools'), 'config', 'self-cap-calibration.rviz'
+        FindPackageShare('gentact_ros_tools'), 'config', 'self-cap-avoidance.rviz'
     ])  
     
     robot_description = ParameterValue(
@@ -31,8 +31,8 @@ def generate_launch_description():
             # ' link2_skin:=', link2_skin, 
             # ' link3_skin:=', link3_skin, 
             # ' link4_skin:=', link4_skin, 
-            # ' link5_skin:=', link5_skin, 
-            # ' link6_skin:=', link6_skin,
+            ' link5_skin:=', link5_skin, 
+            ' link6_skin:=', link6_skin,
             ' ee_xacro_file:=', ee_xacro_file]), 
         value_type=str
     )
@@ -100,6 +100,7 @@ def generate_launch_description():
         package='rviz2',
         executable='rviz2',
         name='rviz2',
+        arguments=['-d', rviz_config_file],
     )
     
     # Sensor     # Declare launch arguments
@@ -168,6 +169,19 @@ def generate_launch_description():
         output='screen',
     )
 
+    capacitive_pcl_node = Node(
+        package='gentact_ros_tools',
+        executable='capacitive_pcl',
+        name='capacitive_pcl',
+        output='screen',
+        parameters=[{
+            'num_sensors': LaunchConfiguration('num_sensors'),
+            'max_distance': 0.1,
+            'sensor_config': PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'config', 'link5_sphere_1.json']),
+            'frame_id': 'link5',
+        }],
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
@@ -185,10 +199,11 @@ def generate_launch_description():
         TimerAction(period=1.0, actions=[robot_state_publisher_node]),
         # TimerAction(period=1.0, actions=[joint_state_publisher_node]),
         TimerAction(period=1.0, actions=[panda2fr3_node]),
-        TimerAction(period=1.0, actions=[fake_obj_pub_node]),
+        # TimerAction(period=1.0, actions=[fake_obj_pub_node]),
         TimerAction(period=1.0, actions=[rviz_node]),
         # TimerAction(period=1.0, actions=[camera_node]),
         # TimerAction(period=1.0, actions=[webcam_node]),
-        # TimerAction(period=1.0, actions=[sensor_publisher_node]),
+        TimerAction(period=1.0, actions=[sensor_publisher_node]),
+        TimerAction(period=1.0, actions=[capacitive_pcl_node]),
 
     ])
