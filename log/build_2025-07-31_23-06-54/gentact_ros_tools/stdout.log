@@ -1,0 +1,162 @@
+running egg_info
+creating build/gentact_ros_tools/gentact_ros_tools.egg-info
+writing build/gentact_ros_tools/gentact_ros_tools.egg-info/PKG-INFO
+writing dependency_links to build/gentact_ros_tools/gentact_ros_tools.egg-info/dependency_links.txt
+writing entry points to build/gentact_ros_tools/gentact_ros_tools.egg-info/entry_points.txt
+writing requirements to build/gentact_ros_tools/gentact_ros_tools.egg-info/requires.txt
+writing top-level names to build/gentact_ros_tools/gentact_ros_tools.egg-info/top_level.txt
+writing manifest file 'build/gentact_ros_tools/gentact_ros_tools.egg-info/SOURCES.txt'
+reading manifest file 'build/gentact_ros_tools/gentact_ros_tools.egg-info/SOURCES.txt'
+writing manifest file 'build/gentact_ros_tools/gentact_ros_tools.egg-info/SOURCES.txt'
+running build
+running build_py
+creating /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build
+creating /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib
+creating /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/ee_prediction_verifier.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/sensor_publisher.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/calibration_static_pub.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/ik_solver.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/tuner.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/sensor_tracking_pub.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/ee_prediction_model_mamba.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/capacitive_pcl.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/calibration_direct_pub.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/panda2fr3.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/__init__.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/fake_obj_pub.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/processor.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/ee_prediction_model_mlp.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+copying gentact_ros_tools/training_data_processor.py -> /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools
+running install
+running install_lib
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/ee_prediction_verifier.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/sensor_publisher.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/calibration_static_pub.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/ik_solver.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/tuner.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/sensor_tracking_pub.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/ee_prediction_model_mamba.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/capacitive_pcl.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/calibration_direct_pub.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/panda2fr3.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/__init__.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/fake_obj_pub.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/processor.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/ee_prediction_model_mlp.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+copying /home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/build/lib/gentact_ros_tools/training_data_processor.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/ee_prediction_verifier.py to ee_prediction_verifier.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/sensor_publisher.py to sensor_publisher.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/calibration_static_pub.py to calibration_static_pub.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/ik_solver.py to ik_solver.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/tuner.py to tuner.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/sensor_tracking_pub.py to sensor_tracking_pub.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/ee_prediction_model_mamba.py to ee_prediction_model_mamba.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/capacitive_pcl.py to capacitive_pcl.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/calibration_direct_pub.py to calibration_direct_pub.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/panda2fr3.py to panda2fr3.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/__init__.py to __init__.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/fake_obj_pub.py to fake_obj_pub.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/processor.py to processor.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/ee_prediction_model_mlp.py to ee_prediction_model_mlp.cpython-310.pyc
+byte-compiling /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools/training_data_processor.py to training_data_processor.cpython-310.pyc
+running install_data
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/ament_index
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/ament_index/resource_index
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/ament_index/resource_index/packages
+copying resource/gentact_ros_tools -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/ament_index/resource_index/packages
+copying package.xml -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/launch
+copying launch/self-cap_calibration.launch.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/launch
+copying launch/training_data_verifier.launch.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/launch
+copying launch/cameras.launch.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/launch
+copying launch/self-cap_processing.launch.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/launch
+copying launch/spad.launch.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/launch
+copying launch/self-cap.launch.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/launch
+copying launch/prediction_sub.launch.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/launch
+copying launch/self-cap_predictions.launch.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/launch
+copying launch/self-cap_avoidance.launch.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/launch
+copying launch/self-cap_calibration_auto.launch.py -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/launch
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/config
+copying config/rviz.rviz -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/config
+copying config/simulation.yaml -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/config
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/msg
+copying gentact_ros_tools/msg/SensorData.msg -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/msg
+copying gentact_ros_tools/msg/PointArray.msg -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/msg
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/visual
+copying meshes/robot_arms/fr3/visual/link3.dae -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/visual
+copying meshes/robot_arms/fr3/visual/link2.dae -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/visual
+copying meshes/robot_arms/fr3/visual/hand.dae -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/visual
+copying meshes/robot_arms/fr3/visual/link1.dae -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/visual
+copying meshes/robot_arms/fr3/visual/link4.dae -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/visual
+copying meshes/robot_arms/fr3/visual/link7.dae -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/visual
+copying meshes/robot_arms/fr3/visual/link5.dae -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/visual
+copying meshes/robot_arms/fr3/visual/finger.dae -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/visual
+copying meshes/robot_arms/fr3/visual/link6.dae -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/visual
+copying meshes/robot_arms/fr3/visual/link0.dae -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/visual
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/collision
+copying meshes/robot_arms/fr3/collision/link6.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/collision
+copying meshes/robot_arms/fr3/collision/hand.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/collision
+copying meshes/robot_arms/fr3/collision/link4.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/collision
+copying meshes/robot_arms/fr3/collision/link1.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/collision
+copying meshes/robot_arms/fr3/collision/link0.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/collision
+copying meshes/robot_arms/fr3/collision/link7.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/collision
+copying meshes/robot_arms/fr3/collision/link3.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/collision
+copying meshes/robot_arms/fr3/collision/link5.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/collision
+copying meshes/robot_arms/fr3/collision/link2.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/robot_arms/fr3/collision
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/skin
+copying meshes/skin/link6.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/skin
+copying meshes/skin/link6_fancy.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/skin
+copying meshes/skin/link5_spad.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/skin
+copying meshes/skin/link5_2.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/skin
+copying meshes/skin/link5.dae -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/skin
+copying meshes/skin/link5.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/skin
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/skin/self-cap
+copying meshes/skin/self-cap/link6_fancy.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/skin/self-cap
+copying meshes/skin/self-cap/link5_fancy.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/skin/self-cap
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/end_effectors
+copying meshes/end_effectors/sphere_tip3.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/end_effectors
+copying meshes/end_effectors/large_plate_ee.stl -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/meshes/end_effectors
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/robot
+copying urdf/robot/fr3_full_skin.xacro -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/robot
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/skin
+copying urdf/skin/self-cap-base.xacro -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/skin
+copying urdf/skin/link6_fancy.xacro -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/skin
+copying urdf/skin/link5_fancy.xacro -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/skin
+copying urdf/skin/link5_spad.xacro -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/skin
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/calibration
+copying urdf/calibration/link5.xacro -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/calibration
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/end_effectors
+copying urdf/end_effectors/large_plate_ee.xacro -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/end_effectors
+copying urdf/end_effectors/sphere_ee.xacro -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/end_effectors
+copying urdf/end_effectors/ee_base.xacro -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/end_effectors
+creating /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/compiled
+copying urdf/compiled/fr3_spheretip.urdf -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/compiled
+copying urdf/compiled/fr3_56_fancy.urdf -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/compiled
+copying urdf/compiled/fr3_plate_rviz.urdf -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/compiled
+copying urdf/compiled/fr3_plate_no_skin.urdf -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/compiled
+copying urdf/compiled/link5_calib.urdf -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/compiled
+copying urdf/compiled/fr3_link5.urdf -> /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/share/gentact_ros_tools/urdf/compiled
+running install_egg_info
+Copying build/gentact_ros_tools/gentact_ros_tools.egg-info to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/lib/python3.10/site-packages/gentact_ros_tools-0.0.0-py3.10.egg-info
+running install_scripts
+Installing calibration_direct_pub script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+Installing capacitive_pcl script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+Installing ee_prediction_model_mamba script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+Installing ee_prediction_model_mlp script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+Installing ee_prediction_verifier script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+Installing fake_obj_pub script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+Installing ik_solver script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+Installing panda2fr3 script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+Installing processor script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+Installing sensor_publisher script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+Installing sensor_subscriber script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+Installing sensor_tracking_pub script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+Installing training_data_processor script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+Installing tuner script to /home/carson/ros2_ws/src/gentact_ros_tools/install/gentact_ros_tools/bin
+writing list of installed files to '/home/carson/ros2_ws/src/gentact_ros_tools/build/gentact_ros_tools/install.log'

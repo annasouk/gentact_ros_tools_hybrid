@@ -1,0 +1,15 @@
+[console_scripts]
+calibration_direct_pub = gentact_ros_tools.calibration_direct_pub:main
+capacitive_pcl = gentact_ros_tools.capacitive_pcl:main
+ee_prediction_model_mamba = gentact_ros_tools.ee_prediction_model_mamba:main
+ee_prediction_model_mlp = gentact_ros_tools.ee_prediction_model_mlp:main
+ee_prediction_verifier = gentact_ros_tools.ee_prediction_verifier:main
+fake_obj_pub = gentact_ros_tools.fake_obj_pub:main
+ik_solver = gentact_ros_tools.ik_solver:main
+panda2fr3 = gentact_ros_tools.panda2fr3:main
+processor = gentact_ros_tools.processor:main
+sensor_publisher = gentact_ros_tools.sensor_publisher:main
+sensor_subscriber = gentact_ros_tools.sensor_subscriber:main
+sensor_tracking_pub = gentact_ros_tools.sensor_tracking_pub:main
+training_data_processor = gentact_ros_tools.training_data_processor:main
+tuner = gentact_ros_tools.tuner:main
