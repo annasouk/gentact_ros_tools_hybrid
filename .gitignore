@@ -1,4 +1,4 @@
-config/rviz.rviz
+config/*.rviz
 build/
 install/
 log/
