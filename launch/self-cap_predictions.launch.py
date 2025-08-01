@@ -140,7 +140,7 @@ def generate_launch_description():
         name='ee_prediction_model_mamba',
         output='screen',
         parameters=[{
-            'model_path': PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'config', 'mamba_model_l5.pth'])
+            'model_path': PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'config', 'mamba_all.pth'])
         }]
     )
 
@@ -190,27 +190,56 @@ def generate_launch_description():
         }]
     )
 
+    # Sensor     # Declare launch arguments
+    serial_port_arg = DeclareLaunchArgument(
+        'serial_port',
+        default_value='/dev/ttyACM0',
+        description='Serial port for sensor data'
+    )
+    
+    publish_rate_arg = DeclareLaunchArgument(
+        'publish_rate',
+        default_value='30.0',
+        description='Publishing rate in Hz'
+    )
+
+    # Create the sensor publisher node
+    sensor_publisher_node = Node(
+        package='gentact_ros_tools',
+        executable='sensor_publisher',
+        name='sensor_publisher',
+        parameters=[{
+            'serial_port': LaunchConfiguration('serial_port'),
+            'num_sensors': LaunchConfiguration('num_sensors'),
+            'publish_rate': LaunchConfiguration('publish_rate'),
+        }],
+        output='screen'
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
             default_value='false',
             description='Use simulation (Gazebo) clock if true'
         ),
+        serial_port_arg,
         num_sensors_arg,
+        publish_rate_arg,
         json_file_arg,
         declare_csv_path,
         declare_frame_id,
         declare_publish_rate,
         declare_publish_all,
         foxglove_bridge_node,
-        TimerAction(period=1.0, actions=[robot_st_base_node]),
-        TimerAction(period=1.0, actions=[reference_point_node]),
+        # TimerAction(period=1.0, actions=[robot_st_base_node]),
+        # TimerAction(period=1.0, actions=[reference_point_node]),
         TimerAction(period=1.0, actions=[calibration_base_node]),
         TimerAction(period=1.0, actions=[skin_state_publisher_node]),
-        TimerAction(period=1.0, actions=[robot_state_publisher_node]),
+        # TimerAction(period=1.0, actions=[robot_state_publisher_node]),
         # TimerAction(period=1.0, actions=[processor_node]),
         # TimerAction(period=1.0, actions=[training_data_processor_node]),
         TimerAction(period=2.0, actions=[ee_prediction_model_node]),
         TimerAction(period=2.0, actions=[ee_prediction_model_mamba_node]),
-        TimerAction(period=3.0, actions=[training_data_node]),
+        # TimerAction(period=3.0, actions=[training_data_node]),
+        TimerAction(period=1.0, actions=[sensor_publisher_node]),
     ])

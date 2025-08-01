@@ -25,3 +25,8 @@ Then the controller
 ```bash
 ros2 run xacro xacro urdf/robot/fr3_full_skin.xacro ee_xacro_file:=~/ros2_ws/src/gentact_ros_tools/urdf/end_effectors/sphere_ee.xacro > urdf/compiled/fr3_spheretip.urdf
 ```
+
+# ML predictions:
+```bash
+ros2 launch gentact_ros_tools self-cap_predictions.launch.py
+```

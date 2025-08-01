@@ -36,7 +36,7 @@ def generate_launch_description():
         output='screen',
         parameters=[{
             'model_path': PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'config', 'mamba_all.pth']),
-            'sensor_frame_id': 'link5_skin'
+            'sensor_frame_id': 'fr3_link5'
         }]
     )
 
@@ -47,7 +47,7 @@ def generate_launch_description():
             default_value='false',
             description='Use simulation (Gazebo) clock if true'
         ),
-        # foxglove_bridge_node,
+        foxglove_bridge_node,
         # ee_prediction_model_node,
         ee_prediction_model_mamba_node,
 
