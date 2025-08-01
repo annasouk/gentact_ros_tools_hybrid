@@ -119,27 +119,6 @@ def build_prediction_nodes(config):
     
     return prediction_nodes
 
-def build_processing_nodes(config):
-    # Conditional nodes based on config
-    processing_nodes = []
-    
-    # Add processing node if active
-    if 'processing' in config and config['processing'].get('active', False):
-        processing_config = config['processing']
-        processing_node = Node(
-            package='gentact_ros_tools',
-            executable='processor',
-            name='processor',
-            parameters=[{
-                'char_file_path': processing_config.get('char_file_path', ''), 
-                'training_data_path': processing_config.get('training_data_path', ''),
-            }],
-            output='screen'
-        )
-        processing_nodes.append(processing_node)
-
-    return processing_nodes
-
 def build_calibration_nodes(config, use_sim_time):
     calibration_nodes = []
     if 'calibration' in config and config['calibration'].get('active', False):
@@ -187,6 +166,19 @@ def build_calibration_nodes(config, use_sim_time):
             }],
             output='screen'
         )
+
+        if calibration_config.get('process', False):
+            calibration_process_node = Node(
+                package='gentact_ros_tools',
+                executable='processor',
+                name='calibration_processor',
+                parameters=[{
+                    'training_data_path': calibration_config.get('training_data_path', ''),
+                    'char_file_path': calibration_config.get('char_file_path', ''),
+                }],
+                output='screen'
+            )
+            calibration_nodes.append(calibration_process_node)
         
         calibration_nodes.append(reference_point_node)
         calibration_nodes.append(calibration_base_node)
@@ -286,24 +278,11 @@ def launch_setup(context, *args, **kwargs):
     
     # Build sensor nodes dynamically from config
     sensor_nodes = build_sensor_nodes(config)
-
-    # Build prediction nodes
     prediction_nodes = build_prediction_nodes(config)
-
-    # Build processing nodes
-    processing_nodes = build_processing_nodes(config)
-
-    # Build joint relay nodes
-    joint_relay_nodes = build_joint_relay_nodes(config)
-
-    # Build visualization nodes
     viz_nodes = build_viz_nodes(config)
-
-    # Build camera nodes
     camera_nodes = build_cameras_nodes(config)
-
-    # Build calibration nodes
     calibration_nodes = build_calibration_nodes(config, use_sim_time)
+    joint_relay_nodes = build_joint_relay_nodes(config)
 
     # Build launch actions list
     launch_actions = [
@@ -330,10 +309,6 @@ def launch_setup(context, *args, **kwargs):
     # Add prediction nodes with delays
     for prediction_node in prediction_nodes:
         launch_actions.append(TimerAction(period=1.0, actions=[prediction_node]))
-
-    # Add processing nodes with delays
-    for processing_node in processing_nodes:
-        launch_actions.append(TimerAction(period=1.0, actions=[processing_node]))
 
     # Add joint relay nodes with delays
     for joint_relay_node in joint_relay_nodes:
