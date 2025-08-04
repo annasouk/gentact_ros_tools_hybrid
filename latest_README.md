@@ -1,3 +1,10 @@
+## Purpose of Packages
+
+- franky sends joint states to the FR3
+- col_avoid_catkin_ws houses the avoidance controllers
+- gen_tact_ros_tools creates an obstacle using the sensor outputs 
+
+## To Run
 Make sure robot joint's unlocked and FCI activated
 Make sure sensor is on robot and connected 
 

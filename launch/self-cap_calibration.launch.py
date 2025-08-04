@@ -130,10 +130,22 @@ def generate_launch_description():
         output='screen'
     )
 
-    camera_node = Node(
+    camera_node_l = Node(
         package='realsense2_camera',
         executable='realsense2_camera_node',
         name='cam_pub',
+        parameters=[{
+            'camera_namespace': "left_cam" 
+        }],
+    )
+
+    camera_node_r = Node(
+        package='realsense2_camera',
+        executable='realsense2_camera_node',
+        name='cam_pub',
+        parameters=[{
+            'camera_namespace': "right_cam" 
+        }],
     )
 
     webcam_node = Node(
@@ -167,8 +179,10 @@ def generate_launch_description():
         TimerAction(period=1.0, actions=[robot_state_publisher_node]),
         # TimerAction(period=1.0, actions=[joint_state_publisher_node]),
         TimerAction(period=1.0, actions=[rviz_node]),
-        TimerAction(period=1.0, actions=[camera_node]),
+        TimerAction(period=1.0, actions=[camera_node_r]),
+        TimerAction(period=1.0, actions=[camera_node_l]),
         TimerAction(period=1.0, actions=[webcam_node]),
         TimerAction(period=1.0, actions=[sensor_publisher_node]),
+        
         # TimerAction(period=2.0, actions=[ee_prediction_model_node]),
     ])
