@@ -53,7 +53,7 @@ class TrainingDataProcessor(Node):
             # Create flat list of headers: timestamp, sensor_0_distance, sensor_1_distance, ..., sensor_0_cc, sensor_1_cc, ...
             headers = ['timestamp']
             headers.extend([f'sensor_{i}_cc' for i in range(self.num_sensors)])
-            headers.extend(['ee_x', 'ee_y', 'ee_z'])
+            headers.extend(['ee_x', 'ee_y', 'ee_z', 'closest_sensor'])
             writer.writerow(headers)
             self.get_logger().info(f"Created new {self.output_file} with headers")
 
@@ -74,6 +74,7 @@ class TrainingDataProcessor(Node):
                 rclpy.time.Time()
             )
             data_log.extend([ee_pose.transform.translation.x, ee_pose.transform.translation.y, ee_pose.transform.translation.z])
+            data_log.extend([self.closest_sensor])
         except Exception as e:
             self.get_logger().error(f"Error getting end effector pose: {str(e)}")
             return
