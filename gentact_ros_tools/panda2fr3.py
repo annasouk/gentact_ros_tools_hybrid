@@ -6,6 +6,9 @@ class Panda2Fr3(Node):
     def __init__(self):
         super().__init__('panda2fr3')
 
+        self.declare_parameter('arm_id', 'fr3')
+        self.arm_id = self.get_parameter('arm_id').get_parameter_value().string_value
+
         self.joint_sub = self.create_subscription(
             JointState,
             '/joint_states',
@@ -15,7 +18,7 @@ class Panda2Fr3(Node):
 
         self.joint_pub = self.create_publisher(
             JointState,
-            '/joint_states_fr3',
+            f'/joint_states_{self.arm_id}',
             10
         )
 
@@ -25,7 +28,7 @@ class Panda2Fr3(Node):
         try:
             joint_state_msg = JointState()
             joint_state_msg.header = msg.header
-            joint_state_msg.name = ['fr3_joint1', 'fr3_joint2', 'fr3_joint3', 'fr3_joint4', 'fr3_joint5', 'fr3_joint6', 'fr3_joint7']
+            joint_state_msg.name = [f'{self.arm_id}_joint1', f'{self.arm_id}_joint2', f'{self.arm_id}_joint3', f'{self.arm_id}_joint4', f'{self.arm_id}_joint5', f'{self.arm_id}_joint6', f'{self.arm_id}_joint7']
             joint_state_msg.position = [msg.position[2], msg.position[3], msg.position[4], msg.position[5], msg.position[6], msg.position[7], msg.position[8]]
             self.joint_pub.publish(joint_state_msg)
         except Exception as e:

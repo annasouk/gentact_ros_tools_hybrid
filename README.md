@@ -61,3 +61,9 @@ ros2 run gentact_ros_tools tuner 0.001
 ```
 
 to rebuild ~/col_avoid_catkin_ws use ```catkin build```
+
+
+# ML predictions:
+```bash
+ros2 launch gentact_ros_tools self-cap_predictions.launch.py
+```
