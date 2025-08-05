@@ -74,6 +74,8 @@ def generate_launch_description():
         arguments=['0', '0', '0', '0', '0', '0', 'map', 'base']
     )
 
+
+
     reference_point_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -162,6 +164,13 @@ def generate_launch_description():
         output='screen',
     )
 
+    franky_xbox = Node(
+        package='gentact_ros_tools',
+        executable='franky_xbox',
+        name='xbox_joint_state_publisher',
+        output='screen'
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
@@ -183,6 +192,6 @@ def generate_launch_description():
         TimerAction(period=1.0, actions=[camera_node_l]),
         TimerAction(period=1.0, actions=[webcam_node]),
         TimerAction(period=1.0, actions=[sensor_publisher_node]),
-        
+        TimerAction(period=1.0, actions=[franky_xbox])
         # TimerAction(period=2.0, actions=[ee_prediction_model_node]),
     ])

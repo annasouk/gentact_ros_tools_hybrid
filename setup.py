@@ -53,6 +53,7 @@ setup(
             'fake_obj_pub = gentact_ros_tools.fake_obj_pub:main',
             'joint_state_test_pub = gentact_ros_tools.joint_state_test_pub:main',
             'franky_relay = gentact_ros_tools.franky_relay:main',
+            'franky_xbox = gentact_ros_tools.franky_xbox:main',
         ],
     },
 )
