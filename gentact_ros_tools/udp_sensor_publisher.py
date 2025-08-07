@@ -16,18 +16,18 @@ class UDPSensorPublisher(Node):
         self.declare_parameter('udp_port', 8888)
         self.declare_parameter('buffer_size', 1024)
         self.declare_parameter('timeout_seconds', 5.0)
+        self.declare_parameter('max_devices', 10)  # Maximum number of devices to track
         
         # Get parameters
         self.udp_port = self.get_parameter('udp_port').get_parameter_value().integer_value
         self.buffer_size = self.get_parameter('buffer_size').get_parameter_value().integer_value
         self.timeout_seconds = self.get_parameter('timeout_seconds').get_parameter_value().double_value
+        self.max_devices = self.get_parameter('max_devices').get_parameter_value().integer_value
         
-        # Initialize publisher
-        self.publisher = self.create_publisher(
-            Float64MultiArray, 
-            '/sensor_raw', 
-            10
-        )
+        # Device tracking
+        self.device_publishers = {}  # device_id -> publisher
+        self.device_last_seen = {}   # device_id -> last_receive_time
+        self.device_receive_counts = {}  # device_id -> receive_count
         
         # UDP socket setup
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -41,14 +41,29 @@ class UDPSensorPublisher(Node):
         self.receive_thread.daemon = True
         self.receive_thread.start()
         
-        # Status tracking
-        self.last_receive_time = time.time()
-        self.receive_count = 0
-        
         # Create timer for status updates
         self.status_timer = self.create_timer(5.0, self._status_update)
         
         self.get_logger().info(f"UDP Sensor Publisher started on port {self.udp_port}")
+        self.get_logger().info(f"Supporting up to {self.max_devices} devices")
+    
+    def _get_or_create_publisher(self, device_id):
+        """Get existing publisher or create new one for device"""
+        if device_id not in self.device_publishers:
+            if len(self.device_publishers) >= self.max_devices:
+                self.get_logger().warn(f"Maximum devices ({self.max_devices}) reached, ignoring device {device_id}")
+                return None
+            
+            # Create new publisher for this device
+            topic_name = f'/sensor_raw/device_{device_id:08x}'
+            publisher = self.create_publisher(Float64MultiArray, topic_name, 10)
+            self.device_publishers[device_id] = publisher
+            self.device_last_seen[device_id] = time.time()
+            self.device_receive_counts[device_id] = 0
+            
+            self.get_logger().info(f"New device connected: {device_id:08x} -> {topic_name}")
+        
+        return self.device_publishers[device_id]
     
     def _receive_loop(self):
         """Main receive loop running in separate thread"""
@@ -61,18 +76,24 @@ class UDPSensorPublisher(Node):
                 sensor_data = self._parse_sensor_data(data)
                 
                 if sensor_data is not None:
-                    # Publish to ROS2
-                    self._publish_sensor_data(sensor_data)
+                    device_id = sensor_data['device_id']
                     
-                    # Update status
-                    self.last_receive_time = time.time()
-                    self.receive_count += 1
+                    # Get or create publisher for this device
+                    publisher = self._get_or_create_publisher(device_id)
                     
-                    # Log received data
-                    self.get_logger().debug(
-                        f"Received from {addr}: device_id={sensor_data['device_id']}, "
-                        f"sensors={sensor_data['sensor_values']}"
-                    )
+                    if publisher is not None:
+                        # Publish to ROS2
+                        self._publish_sensor_data(sensor_data, publisher)
+                        
+                        # Update status
+                        self.device_last_seen[device_id] = time.time()
+                        self.device_receive_counts[device_id] += 1
+                        
+                        # Log received data
+                        self.get_logger().debug(
+                            f"Received from {addr}: device_id={device_id:08x}, "
+                            f"sensors={sensor_data['sensor_values']}"
+                        )
                     
             except socket.timeout:
                 # Timeout is expected, continue
@@ -121,7 +142,7 @@ class UDPSensorPublisher(Node):
             self.get_logger().error(f"Unexpected error parsing data: {e}")
             return None
     
-    def _publish_sensor_data(self, sensor_data):
+    def _publish_sensor_data(self, sensor_data, publisher):
         """Publish sensor data as ROS2 message"""
         try:
             # Create Float64MultiArray message
@@ -129,21 +150,41 @@ class UDPSensorPublisher(Node):
             msg.data = sensor_data['sensor_values']
             
             # Publish
-            self.publisher.publish(msg)
+            publisher.publish(msg)
             
         except Exception as e:
             self.get_logger().error(f"Error publishing sensor data: {e}")
     
     def _status_update(self):
         """Periodic status update"""
-        time_since_last = time.time() - self.last_receive_time
+        current_time = time.time()
+        active_devices = 0
+        total_packets = 0
         
-        if time_since_last > self.timeout_seconds:
-            self.get_logger().warn(f"No data received for {time_since_last:.1f} seconds")
+        # Check each device
+        for device_id in list(self.device_last_seen.keys()):
+            time_since_last = current_time - self.device_last_seen[device_id]
+            packet_count = self.device_receive_counts.get(device_id, 0)
+            total_packets += packet_count
+            
+            if time_since_last > self.timeout_seconds:
+                self.get_logger().warn(
+                    f"Device {device_id:08x}: No data for {time_since_last:.1f}s "
+                    f"(total packets: {packet_count})"
+                )
+            else:
+                active_devices += 1
+                self.get_logger().info(
+                    f"Device {device_id:08x}: {packet_count} packets, "
+                    f"last: {time_since_last:.1f}s ago"
+                )
+        
+        if active_devices == 0:
+            self.get_logger().warn(f"No active devices. Total packets received: {total_packets}")
         else:
             self.get_logger().info(
-                f"Receiving data: {self.receive_count} packets, "
-                f"last: {time_since_last:.1f}s ago"
+                f"Active devices: {active_devices}/{len(self.device_publishers)}, "
+                f"Total packets: {total_packets}"
             )
     
     def destroy_node(self):
