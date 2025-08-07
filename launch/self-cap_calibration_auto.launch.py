@@ -17,7 +17,7 @@ def generate_launch_description():
     # link4_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'skin.xacro'])
     # link5_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'link5_fancy.xacro'])
     # link6_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'skin', 'link6_fancy.xacro'])
-    ee_xacro_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'end_effectors', 'large_plate_ee.xacro'])
+    ee_xacro_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'end_effectors', 'sphere_ee.xacro'])
     urdf_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'robot', 'fr3_full_skin.xacro'])
     calibration_skin = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'calibration', 'link5.xacro'])
     
@@ -59,13 +59,6 @@ def generate_launch_description():
         ]
     )
 
-    joint_state_publisher_node = Node(
-        package='joint_state_publisher_gui',
-        executable='joint_state_publisher_gui',
-        name='fr3_joint_state_publisher',
-        output='screen'
-    )
-
     robot_st_base_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
@@ -97,51 +90,20 @@ def generate_launch_description():
         name='rviz2',
         arguments=['-d', rviz_config_file]
     )
-    
-    # Sensor     # Declare launch arguments
-    serial_port_arg = DeclareLaunchArgument(
-        'serial_port',
-        default_value='/dev/ttyACM0',
-        description='Serial port for sensor data'
-    )
-    
+
     num_sensors_arg = DeclareLaunchArgument(
         'num_sensors',
         default_value='6',
         description='Number of sensors'
     )
-    
-    publish_rate_arg = DeclareLaunchArgument(
-        'publish_rate',
-        default_value='30.0',
-        description='Publishing rate in Hz'
-    )
 
-    # Create the sensor publisher node
-    sensor_publisher_node = Node(
+    processor_node = Node(
         package='gentact_ros_tools',
-        executable='sensor_publisher',
-        name='sensor_publisher',
-        parameters=[{
-            'serial_port': LaunchConfiguration('serial_port'),
-            'num_sensors': LaunchConfiguration('num_sensors'),
-            'publish_rate': LaunchConfiguration('publish_rate'),
-        }],
-        output='screen'
-    )
-
-    camera_node = Node(
-        package='realsense2_camera',
-        executable='realsense2_camera_node',
-        name='cam_pub',
-    )
-
-    webcam_node = Node(
-        package='camera_tools',
-        executable='basic_camera_node',
-        name='webcam',
-        arguments=['-c', '4']
-    )
+        executable='processor',
+        name='processor',
+        output='screen',
+        parameters=[{'num_sensors': LaunchConfiguration('num_sensors')}],
+    )   
 
     foxglove_bridge_node = Node(
         package='foxglove_bridge',
@@ -150,25 +112,49 @@ def generate_launch_description():
         output='screen',
     )
 
+    calibration_direct_pub_node = Node(
+        package='gentact_ros_tools',
+        executable='calibration_direct_pub',
+        name='calibration_direct_pub',
+        output='screen',
+    )
+
+    ik_urdf_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), 'urdf', 'compiled', 'fr3_spheretip.urdf'])
+
+    joint_state_publisher_node = Node(
+        package='joint_state_publisher_gui',
+        executable='joint_state_publisher_gui',
+        name='fr3_joint_state_publisher',
+        output='screen'
+    )
+
+    ik_solver_node = Node(
+        package='gentact_ros_tools',
+        executable='ik_solver',
+        name='ik_solver',
+        output='screen',
+        parameters=[{
+            'urdf_path': ik_urdf_file, 
+            'base_link': 'fr3_link0',  # Changed from fr3_link1
+            'tip_link': 'end_effector_tip'  # Changed from fr3_link7
+        }]
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
             default_value='false',
             description='Use simulation (Gazebo) clock if true'
         ),
-        serial_port_arg,
         num_sensors_arg,
-        publish_rate_arg,
-        # foxglove_bridge_node,
+        foxglove_bridge_node,
         TimerAction(period=1.0, actions=[robot_st_base_node]),
         TimerAction(period=1.0, actions=[reference_point_node]),
         TimerAction(period=1.0, actions=[calibration_base_node]),
         TimerAction(period=1.0, actions=[skin_state_publisher_node]),
         TimerAction(period=1.0, actions=[robot_state_publisher_node]),
+        TimerAction(period=1.0, actions=[calibration_direct_pub_node]),
         # TimerAction(period=1.0, actions=[joint_state_publisher_node]),
-        TimerAction(period=1.0, actions=[rviz_node]),
-        TimerAction(period=1.0, actions=[camera_node]),
-        TimerAction(period=1.0, actions=[webcam_node]),
-        TimerAction(period=1.0, actions=[sensor_publisher_node]),
-        # TimerAction(period=2.0, actions=[ee_prediction_model_node]),
+        TimerAction(period=1.0, actions=[ik_solver_node]),
+        # TimerAction(period=1.0, actions=[processor_node]),
     ])
