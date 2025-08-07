@@ -5,8 +5,6 @@ import socket
 import struct
 import threading
 import time
-import numpy as np
-
 
 class UDPSensorPublisher(Node):
     def __init__(self):
@@ -105,8 +103,8 @@ class UDPSensorPublisher(Node):
     def _parse_sensor_data(self, data):
         """Parse binary sensor data from ESP32"""
         try:
-            # Expected structure: device_id(4) + num_sensors(4) + sensor_values(32)
-            if len(data) < 40:  # Minimum size (4+4+32)
+            # Expected structure: device_id(4) + num_sensors(4) + sensor_values(4)
+            if len(data) < 12:  # Minimum size (4+4+4)
                 self.get_logger().warn(f"Received data too small: {len(data)} bytes")
                 return None
             

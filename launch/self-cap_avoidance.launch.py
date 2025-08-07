@@ -45,6 +45,9 @@ def generate_launch_description():
         name='fr3_robot_state_publisher',
         output='screen',
         parameters=[{'use_sim_time': use_sim_time, 'robot_description': robot_description}],
+        remappings=[
+            ('/joint_states', '/joint_states_fr3')
+        ]
     )
 
     skin_state_publisher_node = Node(
@@ -82,20 +85,21 @@ def generate_launch_description():
         arguments=['0.5', '0', '-0.04', '0', '0', '0', 'map', 'reference_point']
     )
 
-    #ros2 run tf2_ros static_transform_publisher 0.47 0 -0.13 1.5707 0 1.78 map calibration_base
+    #ros2 run tf2_ros static_transform_publisher 0.435 0 -0.13 1.5707 0 1.78 map calibration_base
     calibration_base_node = Node(
         package='tf2_ros',
         executable='static_transform_publisher',
         name='calibration_base_node',
         output='screen',
-        arguments=['0.475', '-0.005', '-0.127', '1.5707', '0', '1.8', 'map', 'calibration_base']
+        arguments=['0.47', '0', '-0.13', '1.5707', '0', '1.78', 'map', 'calibration_base']
     )
+
+
 
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
         name='rviz2',
-        arguments=['-d', rviz_config_file]
     )
     
     # Sensor     # Declare launch arguments
@@ -150,6 +154,20 @@ def generate_launch_description():
         output='screen',
     )
 
+    panda2fr3_node = Node(
+        package='gentact_ros_tools',
+        executable='panda2fr3',
+        name='panda2fr3',
+        output='screen',
+    )
+
+    fake_obj_pub_node = Node(
+        package='gentact_ros_tools',
+        executable='fake_obj_pub',
+        name='fake_obj_pub',
+        output='screen',
+    )
+
     return LaunchDescription([
         DeclareLaunchArgument(
             'use_sim_time',
@@ -161,14 +179,16 @@ def generate_launch_description():
         publish_rate_arg,
         # foxglove_bridge_node,
         TimerAction(period=1.0, actions=[robot_st_base_node]),
-        TimerAction(period=1.0, actions=[reference_point_node]),
-        TimerAction(period=1.0, actions=[calibration_base_node]),
-        TimerAction(period=1.0, actions=[skin_state_publisher_node]),
+        # TimerAction(period=1.0, actions=[reference_point_node]),
+        # TimerAction(period=1.0, actions=[calibration_base_node]),
+        # TimerAction(period=1.0, actions=[skin_state_publisher_node]),
         TimerAction(period=1.0, actions=[robot_state_publisher_node]),
         # TimerAction(period=1.0, actions=[joint_state_publisher_node]),
+        TimerAction(period=1.0, actions=[panda2fr3_node]),
+        TimerAction(period=1.0, actions=[fake_obj_pub_node]),
         TimerAction(period=1.0, actions=[rviz_node]),
-        TimerAction(period=1.0, actions=[camera_node]),
-        TimerAction(period=1.0, actions=[webcam_node]),
-        TimerAction(period=1.0, actions=[sensor_publisher_node]),
-        # TimerAction(period=2.0, actions=[ee_prediction_model_node]),
+        # TimerAction(period=1.0, actions=[camera_node]),
+        # TimerAction(period=1.0, actions=[webcam_node]),
+        # TimerAction(period=1.0, actions=[sensor_publisher_node]),
+
     ])

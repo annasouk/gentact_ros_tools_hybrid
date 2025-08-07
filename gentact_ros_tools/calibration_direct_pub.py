@@ -1,5 +1,7 @@
 from math import sin, cos, pi
+import numpy as np
 import rclpy
+import time
 from rclpy.node import Node
 from rclpy.qos import QoSProfile
 from rclpy.time import Time
@@ -13,7 +15,7 @@ class CalibrationDirectPub(Node):
         super().__init__('calibration_direct_pub')
 
         # Declare parameter with default value
-        self.declare_parameter('robot_namespace', 'link5')
+        self.declare_parameter('robot_namespace', 'calibration')
         self.robot_namespace = self.get_parameter('robot_namespace').get_parameter_value().string_value
 
         # Create broadcaster
@@ -22,28 +24,35 @@ class CalibrationDirectPub(Node):
         self.nodeName = self.get_name()
         self.get_logger().info("{0} started".format(self.nodeName))
 
+        self.target_pose_pub = self.create_publisher(TransformStamped, '/target_pose', 10)
+
         # Initialize sensor counter
         self.sensor_num = 0
         self.sensor_num_max = 7
         
         # Create timer for periodic execution
-        self.timer = self.create_timer(5.0, self.timer_callback)
+        self.timer = self.create_timer(5.0, self.sensor_callback)
 
-    def timer_callback(self):
+    def sensor_callback(self):
         # Get the current sensor transform
-        sensor_frame = self.robot_namespace + '/sensor_' + str(self.sensor_num)
+        sensor_frame = self.robot_namespace + '_sensor_' + str(self.sensor_num)
         self.get_logger().info(f"Trying to get transform for sensor: {sensor_frame}")
 
-        # Create transform
-        transform = TransformStamped()
-        transform.header.stamp = self.get_clock().now().to_msg()
-        transform.header.frame_id = sensor_frame
-        transform.child_frame_id = 'calibration_point'
-        transform.transform.translation.x = 0.0
-        transform.transform.translation.y = 0.0
-        transform.transform.translation.z = 0.1
-        transform.transform.rotation = euler_to_quaternion(0.0, 0.0, 0.0)
-        self.broadcaster.sendTransform(transform)
+        # Create transform with smooth lowering motion
+        iterations = 50  # More iterations for smoother motion
+        height = np.linspace(0.1, 0.01, iterations)
+        for i in range(iterations):
+            transform = TransformStamped()
+            transform.header.stamp = self.get_clock().now().to_msg()
+            transform.header.frame_id = sensor_frame
+            transform.child_frame_id = 'target_pose'
+            transform.transform.translation.x = 0.0
+            transform.transform.translation.y = 0.0
+            transform.transform.translation.z = height[i]
+            transform.transform.rotation = euler_to_quaternion(0.0, 3.14159, 4.0)
+            self.broadcaster.sendTransform(transform)
+            self.target_pose_pub.publish(transform)
+            time.sleep(0.05)  # 50ms delay for smooth motion
         self.get_logger().info(f"Published transform for sensor {self.sensor_num}")
 
         # Increment sensor number
