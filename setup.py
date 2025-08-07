@@ -43,6 +43,7 @@ setup(
             'capacitive_pcl = gentact_ros_tools.capacitive_pcl:main',
             'tuner = gentact_ros_tools.tuner:main',
             'sensor_tracking_pub = gentact_ros_tools.sensor_tracking_pub:main',
+            'udp_sensor_publisher = gentact_ros_tools.udp_sensor_publisher:main',
             'processor = gentact_ros_tools.processor:main',
             'ik_solver = gentact_ros_tools.ik_solver:main',
             'training_data_processor = gentact_ros_tools.training_data_processor:main',
