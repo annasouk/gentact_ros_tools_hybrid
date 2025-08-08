@@ -46,3 +46,5 @@ foxy
 local_ws
 ros2 launch gentact_ros_tools self-cap_avoidance.launch.py 
 
+## record
+ros2 bag record -s mcap --all
