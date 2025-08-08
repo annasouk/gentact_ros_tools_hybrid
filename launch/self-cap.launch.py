@@ -153,19 +153,21 @@ def build_calibration_nodes(config, use_sim_time):
             arguments=[str(x) for x in calibration_config['transform']]
         )
 
-        calibration_sensor_node = Node(
-            package='gentact_ros_tools',
-            executable='sensor_publisher',
-            name=f'calibration_sensor_publisher',
-            parameters=[{
-                'port': calibration_config.get('port', '/dev/ttyACM0'),
-                'wireless': calibration_config.get('wireless', False),
-                'link_name': calibration_config.get('link_name', 'calibration_sensor'),
-                'publish_rate': calibration_config.get('publish_rate', 30.0),
-                'num_sensors': calibration_config.get('num_sensors', 0),
-            }],
-            output='screen'
-        )
+        if calibration_config.get('live_sensor', False):
+            calibration_sensor_node = Node(
+                package='gentact_ros_tools',
+                executable='sensor_publisher',
+                name=f'calibration_sensor_publisher',
+                parameters=[{
+                    'port': calibration_config.get('port', '/dev/ttyACM0'),
+                    'wireless': calibration_config.get('wireless', False),
+                    'link_name': calibration_config.get('link_name', 'calibration_sensor'),
+                    'publish_rate': calibration_config.get('publish_rate', 30.0),
+                    'num_sensors': calibration_config.get('num_sensors', 0),
+                }],
+                output='screen'
+            )
+            calibration_nodes.append(calibration_sensor_node)
 
         if calibration_config.get('process', False):
             calibration_process_node = Node(
@@ -173,17 +175,26 @@ def build_calibration_nodes(config, use_sim_time):
                 executable='processor',
                 name='calibration_processor',
                 parameters=[{
-                    'training_data_path': calibration_config.get('training_data_path', ''),
-                    'char_file_path': calibration_config.get('char_file_path', ''),
+                    'num_sensors': calibration_config.get('num_sensors', 6),
                 }],
                 output='screen'
             )
             calibration_nodes.append(calibration_process_node)
+
+            calibration_training_data_processor_node = Node(
+                package='gentact_ros_tools',
+                executable='training_data_processor',
+                name='calibration_training_data_processor',
+                parameters=[{
+                    'num_sensors': calibration_config.get('num_sensors', 6),
+                }],
+                output='screen'
+            )
+            calibration_nodes.append(calibration_training_data_processor_node)
         
         calibration_nodes.append(reference_point_node)
         calibration_nodes.append(calibration_base_node)
         calibration_nodes.append(skin_state_publisher_node)
-        calibration_nodes.append(calibration_sensor_node)
 
     return calibration_nodes
 
