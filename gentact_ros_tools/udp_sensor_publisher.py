@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Float64MultiArray
+from std_msgs.msg import Float64MultiArray, Int32MultiArray
 import socket
 import struct
 import threading
@@ -54,7 +54,7 @@ class UDPSensorPublisher(Node):
             
             # Create new publisher for this device
             topic_name = f'/sensor_raw/device_{device_id:08x}'
-            publisher = self.create_publisher(Float64MultiArray, topic_name, 10)
+            publisher = self.create_publisher(Int32MultiArray, topic_name, 1)
             self.device_publishers[device_id] = publisher
             self.device_last_seen[device_id] = time.time()
             self.device_receive_counts[device_id] = 0
@@ -90,7 +90,8 @@ class UDPSensorPublisher(Node):
                         # Log received data
                         self.get_logger().debug(
                             f"Received from {addr}: device_id={device_id:08x}, "
-                            f"sensors={sensor_data['sensor_values']}"
+                            f"sensors={sensor_data['sensor_values']}, "
+                            f"raw_size={len(sensor_data['raw_data'])}"
                         )
                     
             except socket.timeout:
@@ -103,7 +104,7 @@ class UDPSensorPublisher(Node):
     def _parse_sensor_data(self, data):
         """Parse binary sensor data from ESP32"""
         try:
-            # Expected structure: device_id(4) + num_sensors(4) + sensor_values(4)
+            # Expected structure: device_id(4) + num_sensors(4) + sensor_values(4*num_sensors)
             if len(data) < 12:  # Minimum size (4+4+4)
                 self.get_logger().warn(f"Received data too small: {len(data)} bytes")
                 return None
@@ -117,13 +118,25 @@ class UDPSensorPublisher(Node):
                 self.get_logger().warn(f"Invalid sensor count: {num_sensors}")
                 return None
             
-            # Parse sensor values (each float is 4 bytes)
+            # Validate device_id
+            if device_id == 0:
+                self.get_logger().warn("Invalid device_id: 0")
+                return None
+            
+            # Calculate expected data size
+            expected_size = 8 + (num_sensors * 4)  # header + sensor values
+            if len(data) < expected_size:
+                self.get_logger().warn(f"Data size mismatch: expected {expected_size}, got {len(data)}")
+                return None
+            
+            # Parse sensor values (each long is 4 bytes)
             sensor_values = []
             for i in range(num_sensors):
                 start_idx = 8 + (i * 4)
                 end_idx = start_idx + 4
                 if end_idx <= len(data):
-                    value = struct.unpack('<f', data[start_idx:end_idx])[0]
+                    # Parse as long (32-bit integer) from ESP32
+                    value = struct.unpack('<l', data[start_idx:end_idx])[0]
                     sensor_values.append(value)
             
             return {
@@ -143,9 +156,17 @@ class UDPSensorPublisher(Node):
     def _publish_sensor_data(self, sensor_data, publisher):
         """Publish sensor data as ROS2 message"""
         try:
-            # Create Float64MultiArray message
-            msg = Float64MultiArray()
-            msg.data = sensor_data['sensor_values']
+            # Create Int32MultiArray message
+            msg = Int32MultiArray()
+            
+            # Convert and clamp sensor values to valid int32 range
+            clamped_values = []
+            for value in sensor_data['sensor_values']:
+                # Clamp to int32 range [-2147483648, 2147483647]
+                clamped_value = max(-2147483648, min(2147483647, int(value)))
+                clamped_values.append(clamped_value)
+            
+            msg.data = clamped_values
             
             # Publish
             publisher.publish(msg)
