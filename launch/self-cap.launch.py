@@ -176,6 +176,7 @@ def build_calibration_nodes(config, use_sim_time):
                 name='calibration_processor',
                 parameters=[{
                     'num_sensors': calibration_config.get('num_sensors', 6),
+                    'use_sim_time': use_sim_time,
                 }],
                 output='screen'
             )
@@ -187,6 +188,7 @@ def build_calibration_nodes(config, use_sim_time):
                 name='calibration_training_data_processor',
                 parameters=[{
                     'num_sensors': calibration_config.get('num_sensors', 6),
+                    'use_sim_time': use_sim_time,
                 }],
                 output='screen'
             )
