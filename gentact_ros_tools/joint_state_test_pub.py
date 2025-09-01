@@ -6,9 +6,13 @@ class JointStateTestPub(Node):
     def __init__(self):
         super().__init__('joint_state_test_pub')
         self.get_logger().info('Joint State Test Pub node initialized')
-        self.joint_state_pub = self.create_publisher(JointState, 'joint_states', 10)
+        
+        self.declare_parameter('arm_id', 'fr3')
+        self.arm_id = self.get_parameter('arm_id').get_parameter_value().string_value
+        
+        self.joint_state_pub = self.create_publisher(JointState, f'joint_states_{self.arm_id}', 10)
         self.joint_state_msg = JointState()
-        self.joint_state_msg.name = ['joint1', 'joint2', 'joint3', 'joint4', 'joint5', 'joint6', 'joint7']
+        self.joint_state_msg.name = [f'{self.arm_id}_joint1', f'{self.arm_id}_joint2', f'{self.arm_id}_joint3', f'{self.arm_id}_joint4', f'{self.arm_id}_joint5', f'{self.arm_id}_joint6', f'{self.arm_id}_joint7']
 
         self.timer = self.create_timer(5, self.timer_callback)
         self.counter = 0

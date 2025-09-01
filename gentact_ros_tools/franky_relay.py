@@ -39,34 +39,48 @@ class FrankyRelay(Node):
     def __init__(self):
         super().__init__('franky_relay')
         self.get_logger().info('Franky Relay node initialized')
-        self.joint_sub = self.create_subscription(JointState, 'joint_states_fr3', self.joint_state_callback, 10)
-        self.joint_states = np.array([0.0, -0.785, 0.0, -2.356, 0.0, 1.571, 0.785])
-
+        
+        # Store latest joint state data
+        self.latest_joint_states = np.array([0.0, -0.785, 0.0, -2.356, 0.0, 1.571, 0.785])
+        self.joint_states_updated = False
+        
+        # Subscribe to joint states topic
+        self.joint_sub = self.create_subscription(JointState, 'joint_states_fr3', self.joint_state_callback, 1)
+        
+        # Create timer for 30 Hz processing (1000ms / 30 = 33.33ms)
+        self.timer = self.create_timer(1.0/80.0, self.timer_callback)
 
         self.robot = Robot("192.168.0.198")  # Replace this with your robot's IP
         self.robot.relative_dynamics_factor = 0.1
         self.robot.recover_from_errors()
 
-        print(f'Moving to home position: {self.joint_states}')
-        home_motion = JointMotion(self.joint_states)
+        print(f'Moving to home position: {self.latest_joint_states}')
+        home_motion = JointMotion(self.latest_joint_states)
         self.robot.move(home_motion)
+        self.robot.relative_dynamics_factor = 0.1
 
     def joint_state_callback(self, msg):
         try:
-            self.joint_states = np.array(msg.position[:7])
-            self.get_logger().info(f'Received joint states: {self.joint_states}')
+            self.latest_joint_states = np.array(msg.position[:7])
+            self.joint_states_updated = True
+        except Exception as e:
+            self.get_logger().error(f'Error in joint_state_callback: {e}')
+
+    def timer_callback(self):
+        if not self.joint_states_updated:
+            return
+            
+        try:
             current_joints = np.array(self.robot.current_joint_state.position[:7])
-            print(f'Current joints: {current_joints}')
-            print(f'Desired joints: {self.joint_states}')
             scaling = 1.0
-            diff = (self.joint_states - current_joints) * scaling
-            print(f'Diff: {diff=}')
+            diff = (self.latest_joint_states - current_joints) * scaling
             motion = JointVelocityMotion(
                 diff, duration=Duration(1000),
             )
             self.robot.move(motion, asynchronous=True)
+            self.joint_states_updated = False
         except Exception as e:
-            self.get_logger().error(f'Error in joint_state_callback: {e}')
+            self.get_logger().error(f'Error in timer_callback: {e}')
             self.robot.recover_from_errors()
 
 

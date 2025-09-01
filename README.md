@@ -62,6 +62,11 @@ ros2 run gentact_ros_tools tuner 0.001
 
 to rebuild ~/col_avoid_catkin_ws use ```catkin build```
 
+# Running the demo
+```bash
+bash ~/Desktop/self-cap-demos/collision_avoidance.sh
+```
+
 
 # ML predictions:
 ```bash

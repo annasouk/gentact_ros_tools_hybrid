@@ -42,6 +42,7 @@ from dataclasses import dataclass
 import threading
 from inputs import get_gamepad
 import signal
+import franky
 
 
 def truncate_float(x, decimal_places=1):
@@ -51,13 +52,20 @@ def truncate_float(x, decimal_places=1):
     # print(truncated_x)
     return truncated_x
 
+def if_move_to_home(move_to_home, robot):
+    if move_to_home:
+        robot.relative_dynamics_factor = 0.09
+        robot.move_home()
+        robot.relative_dynamics_factor = 0.02
+
 
 class GameController(object):
     # These values are different for different controllers.
     MAX_TRIG_VAL = 128.0
     MAX_JOY_VAL = 32767.0
 
-    def __init__(self):
+    def __init__(self, robot):
+        self.robot = robot
         self.LeftJoystickY = 0.0
         self.LeftJoystickX = 0.0
         self.RightJoystickY = 0.0
@@ -86,6 +94,9 @@ class GameController(object):
         self._monitor_thread.start()
 
     def get_robot_inputs_from_controller(self):
+
+        if_move_to_home(self.Start, self.robot)
+
         position_multiplier = 10.0 / 100.0
         angle_multiplier = 1.0
         left_x = truncate_float(self.LeftJoystickY) * position_multiplier
@@ -206,13 +217,17 @@ class FrankaRobot(object):
         self.robot.recover_from_errors()
         # This controls the max percentage of jerk, acceleration, and velocity allowed in a motion.
         # A value of 0.05 means 5% of the maximum allowed.
-        self.robot.relative_dynamics_factor = 0.05
+        self.robot.relative_dynamics_factor = 0.02
         self.home = JointMotion([0.0, -0.785, 0.0, -2.356, 0.0, 1.571, 0.785])
 
     def move_home(self):
+        self.robot.relative_dynamics_factor = 0.09
         self.robot.move(self.home)
         # self.gripper.move(self.gripper.max_width, self.gripper_speed)
         # self.gripper.move(0, self.gripper_speed)
+        
+        #return it to normal speed
+        self.robot.relative_dynamics_factor = 0.02
 
     def print_q(self):
         print(f"{self.robot.current_joint_positions=}")
@@ -302,7 +317,6 @@ class FrankaRobot(object):
         return obs_data
     
 
-
 class FrankyXbox(Node):
     def __init__(self):
         super().__init__('franky_xbox_controller')
@@ -310,12 +324,15 @@ class FrankyXbox(Node):
         
         # Publishers
         self.joint_pub = self.create_publisher(JointState, '/joint_states', 10)
+        self.declare_parameter('arm_id', 'fr3')
+        self.arm_id = self.get_parameter('arm_id').get_parameter_value().string_value
 
         # Initialize robot control components
         self.running = True
-        self.joy = GameController()
+        
         self.robot = FrankaRobot()
         self.robot.robot.recover_from_errors()
+        self.joy = GameController(self.robot)
 
         # Control loop parameters
         self.target_frequency = 100  # Hz
@@ -359,7 +376,7 @@ class FrankyXbox(Node):
             # Create proper JointState message
             joint_state_msg = JointState()
             joint_state_msg.header.stamp = self.get_clock().now().to_msg()
-            joint_state_msg.name = [f'panda_joint{i+1}' for i in range(7)]
+            joint_state_msg.name = [f'{self.arm_id}_joint{i+1}' for i in range(7)]
             joint_state_msg.position = joint_positions.tolist() if hasattr(joint_positions, 'tolist') else list(joint_positions)
             joint_state_msg.velocity = [0.0] * 7  # Add zero velocities
             joint_state_msg.effort = [0.0] * 7    # Add zero efforts
@@ -374,6 +391,10 @@ class FrankyXbox(Node):
                 # Send commands to robot
                 self.robot.move_velocity_inputs(robot_inputs)
 
+            except franky._franky.InvalidMotionTypeException as e:
+                #this isn't a good solution because joint publisher stops running 
+                #Allows robot to move back to home while loop is running 
+                pass
             except Exception as e:
                 self.get_logger().error(f"Exception occurred while moving robot: {e}")
                 try:
@@ -383,6 +404,15 @@ class FrankyXbox(Node):
                     self.get_logger().error(f"Failed to recover from errors: {recovery_error}")
                     self.running = False
                     return
+            except franky._franky.ControlException as cntrl_exp:
+                self.get_logger().error(f"Control exception: {cntrl_exp}")
+                
+                try:
+                    self.robot.move_home()
+                except Exception as reflex_mode:
+                    self.get_logger().error(f"Move to start failed: {reflex_mode}")
+                    pass
+                return 
 
         except Exception as e:
             self.get_logger().error(f"Fatal error in control loop: {e}")
@@ -427,11 +457,11 @@ class FrankyXbox(Node):
 def main(args=None):
     rclpy.init(args=args)
     franky_xbox = FrankyXbox()
-    
-    rclpy.spin(franky_xbox)
-    franky_xbox.shutdown()
-    franky_xbox.destroy_node()
-    rclpy.shutdown()
+
+    try:
+        rclpy.spin(franky_xbox)
+    except KeyboardInterrupt:
+        pass
     
     franky_xbox.get_logger().info("Cleanup complete")
 

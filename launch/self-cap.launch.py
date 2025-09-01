@@ -1,3 +1,5 @@
+from logging import Logger
+from math import log
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, TimerAction, OpaqueFunction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
@@ -8,6 +10,7 @@ from launch_ros.parameter_descriptions import ParameterValue
 
 import os
 import yaml
+import subprocess
 
 def load_config(config_file_name, context):
     package_share = FindPackageShare('gentact_ros_tools').perform(context)
@@ -57,11 +60,12 @@ def build_sensor_nodes(config):
                 executable='sensor_publisher',
                 name=f'{sensor_key}_publisher',
                 parameters=[{
-                    'port': sensor_config.get('port', '/dev/ttyACM0'),
+                    'serial_port': sensor_config.get('port', '/dev/ttyACM0'),
                     'wireless': sensor_config.get('wireless', False),
                     'link_name': sensor_key.replace('_skin', ''),
                     'publish_rate': config['sensors'].get('publish_rate', 30.0),
                     'num_sensors': sensor_config.get('num_sensors', 0),
+                    'skin_name': sensor_config.get('name', ''),
                 }],
                 output='screen'
             )
@@ -69,23 +73,37 @@ def build_sensor_nodes(config):
     
     return sensor_nodes
 
-def build_prediction_nodes(config):
-    # Prediction nodes based on config
+def build_prediction_nodes(config, sensor_key, sensor_config):
+    # Prediction nodes based on config for a specific sensor
     prediction_nodes = []
     
     # Add prediction nodes if active
     if 'prediction' in config and config['prediction'].get('active', False):
         prediction_config = config['prediction']
+
+        # tracking_node = Node(
+        #     package='gentact_ros_tools',
+        #     executable='sensor_tracking_pub',
+        #     name='sensor_tracking_pub',
+        #     output='screen'
+        # )
+        # prediction_nodes.append(tracking_node)
         
         # Add PCL prediction if active
         if prediction_config.get('pcl', {}).get('active', False):
+            # Extract link name from sensor key (remove _skin suffix if present)
+            link_name = sensor_key.replace('_skin', '')
+            
             pcl_node = Node(
                 package='gentact_ros_tools',
-                executable='pcl_prediction',
-                name='pcl_prediction',
+                executable='capacitive_pcl',
+                name=f'pcl_prediction_{link_name}',
                 parameters=[{
+                    'frame_id': link_name,
+                    'num_sensors': sensor_config.get('num_sensors', 0),
+                    'skin_name': sensor_config.get('name', ''),
                     'alpha': prediction_config['pcl'].get('alpha', 0.003),
-                    'min_dist': prediction_config['pcl'].get('min_dist', 0.01),
+                    'max_distance': prediction_config['pcl'].get('max_distance', 0.1),
                 }],
                 output='screen'
             )
@@ -96,9 +114,10 @@ def build_prediction_nodes(config):
             mlp_node = Node(
                 package='gentact_ros_tools',
                 executable='mlp_prediction',
-                name='mlp_prediction',
+                name=f'mlp_prediction_{link_name}',
                 parameters=[{
                     'model_path': prediction_config['mlp'].get('model_path', ''),
+                    'skin_name': sensor_config.get('name', ''),
                 }],
                 output='screen'
             )
@@ -109,9 +128,10 @@ def build_prediction_nodes(config):
             mamba_node = Node(
                 package='gentact_ros_tools',
                 executable='mamba_prediction',
-                name='mamba_prediction',
+                name=f'mamba_prediction_{link_name}',
                 parameters=[{
                     'model_path': prediction_config['mamba'].get('model_path', ''),
+                    'skin_name': sensor_config.get('name', ''),
                 }],
                 output='screen'
             )
@@ -158,10 +178,10 @@ def build_calibration_nodes(config, use_sim_time):
             executable='sensor_publisher',
             name=f'calibration_sensor_publisher',
             parameters=[{
-                'port': calibration_config.get('port', '/dev/ttyACM0'),
+                'serial_port': calibration_config.get('port', '/dev/ttyACM0'),
                 'wireless': calibration_config.get('wireless', False),
                 'link_name': calibration_config.get('link_name', 'calibration_sensor'),
-                'publish_rate': calibration_config.get('publish_rate', 30.0),
+                'publish_rate': calibration_config.get('publish_rate', 10.0),
                 'num_sensors': calibration_config.get('num_sensors', 0),
             }],
             output='screen'
@@ -186,20 +206,36 @@ def build_calibration_nodes(config, use_sim_time):
         calibration_nodes.append(calibration_sensor_node)
 
     return calibration_nodes
+'''
+def ros1_ros2_bridge():
+    
+    subprocess.run(["bash;noetic;foxy;ros2 run ros1_bridge dynamic_bridge"], 
+                    shell=True) 
+
+def build_avoidance_controller_nodes(config):
+    avoidance_controller_nodes = []
+    if "avoidance_controller" in config:
+        subprocess.run(["bash", 
+                        "noetic", 
+                        "foxy",
+                        "ros2 run ros1_bridge dynamic_bridge"], 
+                    shell=False) 
+'''
+        
 
 def build_joint_relay_nodes(config):
     joint_relay_nodes = []
     if config['robot']['joint_relay']:
-        joint_relay_nodes.append(Node( # Controls the franka to mimic /joint_states_{arm_id}
-            package='gentact_ros_tools',
-            executable='franky_relay',
-            name='franky_relay',
-            output='screen',
-            parameters=[{
-                'robot_ip': config['robot']['robot_ip'],
-                'arm_id': config['robot']['arm_id'],
-            }]
-        ))
+        # joint_relay_nodes.append(Node( # Controls the franka to mimic /joint_states_{arm_id}
+        #     package='gentact_ros_tools',
+        #     executable='franky_relay',
+        #     name='franky_relay',
+        #     output='screen',
+        #     parameters=[{
+        #         'robot_ip': config['robot']['robot_ip'],
+        #         'arm_id': config['robot']['arm_id'],
+        #     }]
+        # ))
 
         joint_relay_nodes.append(Node( # Relays /joint_states to the robot's namespace
             package='gentact_ros_tools',
@@ -221,10 +257,13 @@ def build_viz_nodes(config):
             executable='rviz2',
             name='rviz2',
             output='screen',
+            emulate_tty=True,
+            sigterm_timeout='5',
             parameters=[{
                 'config': config['visualization']['rviz_config'],
             }]
         ))
+
 
     if config['visualization']['foxglove']:
         viz_nodes.append(Node(
@@ -236,6 +275,21 @@ def build_viz_nodes(config):
 
     return viz_nodes
 
+"""
+def build_tuner_nodes(config):
+    tuner_nodes = []
+    if config['avoidance']['active']:
+        tuner_nodes.append(Node(
+            package='gentact_ros_tools',
+            executable='tuner',
+            name='rviz2',
+            output='screen',
+            parameters=[{
+                'config': config['visualization']['rviz_config'],
+            }]
+        ))
+"""
+        
 def build_cameras_nodes(config):
     cameras_nodes = []
     if config['cameras']['active']:
@@ -252,6 +306,7 @@ def build_cameras_nodes(config):
         cameras_nodes.append(cameras_launch)
     return cameras_nodes
 
+
 def launch_setup(context, *args, **kwargs):
     # Get the config file name from launch configuration
     config_file_name = LaunchConfiguration('config').perform(context)
@@ -266,7 +321,11 @@ def launch_setup(context, *args, **kwargs):
         executable='robot_state_publisher',
         name=f'{config["robot"]["arm_id"]}_robot_state_publisher',
         output='screen',
-        parameters=[{'use_sim_time': use_sim_time, 'robot_description': robot_description}]
+        parameters=[{'use_sim_time': use_sim_time, 'robot_description': robot_description}],
+        remappings=[
+                ('/joint_states', '/joint_states_fr3'),
+                ('/robot_description', '/robot_description_fr3')
+            ]
     )
     robot_st_base_node = Node(
         package='tf2_ros',
@@ -276,9 +335,17 @@ def launch_setup(context, *args, **kwargs):
         arguments=['0', '0', '0', '0', '0', '0', 'map', 'base']
     )
     
+    
     # Build sensor nodes dynamically from config
     sensor_nodes = build_sensor_nodes(config)
-    prediction_nodes = build_prediction_nodes(config)
+    
+    # Build prediction nodes for each active sensor
+    prediction_nodes = []
+    for sensor_key, sensor_config in config['sensors'].items():
+        if isinstance(sensor_config, dict) and sensor_config.get('active', False):
+            sensor_prediction_nodes = build_prediction_nodes(config, sensor_key, sensor_config)
+            prediction_nodes.extend(sensor_prediction_nodes)
+    
     viz_nodes = build_viz_nodes(config)
     camera_nodes = build_cameras_nodes(config)
     calibration_nodes = build_calibration_nodes(config, use_sim_time)
@@ -289,6 +356,15 @@ def launch_setup(context, *args, **kwargs):
         robot_state_publisher_node,
         robot_st_base_node,
     ]
+
+    if config['calibration']['xbox']:
+        xbox_joint_states = Node(
+            package='gentact_ros_tools',
+            executable='franky_xbox',
+            name='xbox_joint_states',
+            output='screen'
+        )
+        launch_actions.append(xbox_joint_states)
 
     # Add visualization nodes
     for viz_node in viz_nodes:
@@ -313,6 +389,9 @@ def launch_setup(context, *args, **kwargs):
     # Add joint relay nodes with delays
     for joint_relay_node in joint_relay_nodes:
         launch_actions.append(TimerAction(period=5.0, actions=[joint_relay_node]))
+
+    #print("Running ros1_ros2_bridge")
+    #ros1_ros2_bridge()
 
     return launch_actions
 
