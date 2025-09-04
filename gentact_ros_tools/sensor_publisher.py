@@ -15,7 +15,7 @@ class SensorPublisher(Node):
         self.declare_parameter('publish_rate', 30.0)  # Hz
         self.declare_parameter('startup_timeout', 3.0)  # seconds
         self.declare_parameter('calibration_duration', 3.0)  # seconds
-        self.declare_parameter('skin_unit_num', -1)
+        self.declare_parameter('skin_name', '')
         
         # Get parameters
         self.serial_port = self.get_parameter('serial_port').get_parameter_value().string_value
@@ -23,11 +23,12 @@ class SensorPublisher(Node):
         self.publish_rate = self.get_parameter('publish_rate').get_parameter_value().double_value
         self.startup_timeout = self.get_parameter('startup_timeout').get_parameter_value().double_value
         self.calibration_duration = self.get_parameter('calibration_duration').get_parameter_value().double_value
+        self.skin_name = self.get_parameter('skin_name').get_parameter_value().string_value
         self.last_data = []
         self.baseline_data = None
         
         # Initialize publisher
-        if self.skin_unit_num == -1:
+        if self.skin_name == '':
             self.publisher = self.create_publisher(
                 Int32MultiArray, 
                 '/sensor_raw', 

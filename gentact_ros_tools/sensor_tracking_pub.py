@@ -18,7 +18,9 @@ class SensorTrackingPublisher(Node):
         self.declare_parameter('baseline_kd', 0.000001)  # Derivative gain for baseline PID
         self.declare_parameter('baseline_duration', 3.0)  # Baseline collection duration in seconds
         self.declare_parameter('baseline_timeout', 10.0)  # Max time to wait for baseline collection
-        
+        self.declare_parameter('skin_name', '')
+        self.declare_parameter('masking_threshold', 200.0)  # Threshold for masking baseline updates
+
         # Get parameters
         self.num_sensors = self.get_parameter('num_sensors').get_parameter_value().integer_value
         self.Kp = self.get_parameter('Kp').get_parameter_value().double_value
@@ -28,7 +30,8 @@ class SensorTrackingPublisher(Node):
         self.baseline_kd = self.get_parameter('baseline_kd').get_parameter_value().double_value
         self.baseline_duration = self.get_parameter('baseline_duration').get_parameter_value().double_value
         self.baseline_timeout = self.get_parameter('baseline_timeout').get_parameter_value().double_value
-        
+        self.skin_name = self.get_parameter('skin_name').get_parameter_value().string_value
+        self.masking_threshold = self.get_parameter('masking_threshold').get_parameter_value().double_value
         # Initialize baseline collection
         self.start_time = time.time()
         self.baseline_collected = False
@@ -52,16 +55,26 @@ class SensorTrackingPublisher(Node):
         self.baseline_mask_timeout = 15.0  # seconds
         
         # Subscribe to raw sensor data
-        self.subscription = self.create_subscription(
-            Int32MultiArray,
-            '/sensor_raw',
-            self.sensor_callback,
-            1
-        )
-        
-        # Create publishers
-        self.tracking_publisher = self.create_publisher(Int32MultiArray, '/sensor_tracking', 1)
-        self.baseline_publisher = self.create_publisher(Int32MultiArray, '/sensor_baseline', 1)
+        if self.skin_name == '':
+            self.subscription = self.create_subscription(
+                Int32MultiArray,
+                '/sensor_raw',
+                self.sensor_callback,
+                1
+            )
+            # Create publishers
+            self.tracking_publisher = self.create_publisher(Int32MultiArray, '/sensor_tracking', 1)
+            self.baseline_publisher = self.create_publisher(Int32MultiArray, '/sensor_baseline', 1)
+        else:
+            self.subscription = self.create_subscription(
+                Int32MultiArray,
+                f'/sensor_raw_{self.skin_name}',
+                self.sensor_callback,
+                1
+            )
+            # Create publishers
+            self.tracking_publisher = self.create_publisher(Int32MultiArray, f'/sensor_tracking_{self.skin_name}', 1)
+            self.baseline_publisher = self.create_publisher(Int32MultiArray, f'/sensor_baseline_{self.skin_name}', 1)
         
         # Create timer to check for sensor data timeout
         self.timeout_timer = self.create_timer(1.0, self.check_sensor_timeout)
@@ -141,7 +154,7 @@ class SensorTrackingPublisher(Node):
         err = signal - self.baseline_values
 
         # Don't track to super strong signals (element-wise)
-        strong_signal_mask = np.abs(err) > 2*np.abs(self.baseline_values)
+        strong_signal_mask = np.abs(err) > self.masking_threshold
         
         # Track mask timing for each sensor
         for i in range(self.num_sensors):

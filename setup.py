@@ -54,6 +54,7 @@ setup(
             'joint_state_test_pub = gentact_ros_tools.joint_state_test_pub:main',
             'franky_relay = gentact_ros_tools.franky_relay:main',
             'franky_xbox = gentact_ros_tools.franky_xbox:main',
+            'closest_obstacle = gentact_ros_tools.closest_obstacle:main',
         ],
     },
 )

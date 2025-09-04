@@ -25,6 +25,7 @@ class CapacitivePCL(Node):
         self.declare_parameter('output_frame', 'map')
         self.declare_parameter('time_offset_sec', 0.1)
         self.declare_parameter('skin_name', '')
+        self.declare_parameter('multiplier', None)  # Multiplier for each sensor
 
         # Get parameters
         self.num_sensors = self.get_parameter('num_sensors').get_parameter_value().integer_value
@@ -36,6 +37,10 @@ class CapacitivePCL(Node):
         self.skin_name = self.get_parameter('skin_name').get_parameter_value().string_value
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
+        self.multiplier = self.get_parameter('multiplier').get_parameter_value().double_array_value
+        if self.multiplier is None or len(self.multiplier) == 0 or len(self.multiplier) != self.num_sensors:
+            self.get_logger().info(f"No valid multiplier provided, defaulting to array of ones for {self.num_sensors} sensors")
+            self.multiplier = np.ones(self.num_sensors)
 
         # NOTE: To prevent overflow, we prematurely apply at 10^13 magnatude shift due to approximate the permittivity of air
         self.clock_freq = 160.0  # 160 MHz clock frequency for Qwiic board
@@ -157,14 +162,17 @@ class CapacitivePCL(Node):
 
         # Debug accumulation for per-second stats
         self._debug_values_per_sensor = [[] for _ in range(self.num_sensors)]
-        self._debug_timer = self.create_timer(1.0, self._emit_debug_stats)
+        # self._debug_timer = self.create_timer(1.0, self._emit_debug_stats)
 
     def tuning_callback(self, msg: Float64):
         self.alpha = float(msg.data)
         self.get_logger().info(f"Received tuning alpha: {self.alpha}")
     
     def baseline_callback(self, msg: Int32MultiArray):
-        self.baseline = msg.data
+        if len(msg.data) >= self.num_sensors:
+            self.baseline = msg.data
+        else:
+            self.get_logger().warn(f"Received baseline with {len(msg.data)} elements, expected {self.num_sensors}. Ignoring update.")
         # self.get_logger().info(f"Received baseline: {self.baseline}")
     
     def tracking_callback(self, msg: Int32MultiArray):
@@ -278,8 +286,16 @@ class CapacitivePCL(Node):
             # Get sensor values
             sensor_values = msg.data
             
+            # Check if we have any sensor data at all
+            if len(sensor_values) == 0:
+                self.get_logger().warn("Received empty sensor data, skipping processing")
+                return
+            
             # Ensure we have the expected number of sensors
             num_available = min(len(sensor_values), self.num_sensors)
+            
+            if len(sensor_values) < self.num_sensors:
+                self.get_logger().debug(f"Received {len(sensor_values)} sensor values, expected {self.num_sensors}")
             dist_values = []
             all_sensor_points = []  # in sensor frames
             combined_points_map = []  # transformed to output frame
@@ -292,11 +308,11 @@ class CapacitivePCL(Node):
                     capacitance = -(np.abs(sensor_values[i])) / (self.clock_freq * self.R[i] * 30.0 * math.log(0.5))
                 else:
                     capacitance = -(np.abs(sensor_values[i] - self.baseline[i])) / (self.clock_freq * self.R[i] * 30.0 * math.log(0.5))
-                distance = self.alpha / capacitance
+                distance = (self.alpha / np.abs(capacitance)) * self.multiplier[i]
                 raw_dist_values.append(distance)
                 # Accumulate predicted distance for per-second debug stats
-                if i < len(self._debug_values_per_sensor):
-                    self._debug_values_per_sensor[i].append(float(distance))
+                # if i < len(self._debug_values_per_sensor):
+                #     self._debug_values_per_sensor[i].append(float(distance))
 
                 # Create pointcloud for this sensor
                 # Copy base points and offset them by the distance in Z
@@ -308,7 +324,7 @@ class CapacitivePCL(Node):
                     self.get_logger().debug(f"Sensor {i} within range: {distance:.6f}m")
                 else:
                     # Out of range: publish at -0.2 * max_distance
-                    sensor_points[2] = -0.2 * self.max_distance
+                    sensor_points[2] = 10000 * self.max_distance
                     self.get_logger().debug(f"Sensor {i} out of range ({distance:.6f}m), publishing at {-0.2 * self.max_distance:.6f}m")
                     distance = self.max_distance*1000
                 
@@ -329,8 +345,8 @@ class CapacitivePCL(Node):
                     # Skip if TF not ready for this sensor
                     pass
                 dist_values.append(distance)
-            # dist_msg = Float64MultiArray(data=dist_values)
-            # self.dist_pub.publish(dist_msg)
+            dist_msg = Float64MultiArray(data=raw_dist_values)
+            self.dist_pub.publish(dist_msg)
             
             # self.get_logger().debug(f"Published pointclouds for {num_available} sensors")
 
@@ -340,15 +356,25 @@ class CapacitivePCL(Node):
                 combined_msg = self.create_pointcloud_msg_multi(combined_array, self.output_frame)
                 self.combined_pcl_pub.publish(combined_msg)
 
-            # Get lowest distance sensor
-            min_distance_sensor = np.argmin(raw_dist_values)
-            min_distance = raw_dist_values[min_distance_sensor]
-            # self.get_logger().info(f"Lowest distance sensor: {min_distance_sensor}")
+            # Get lowest distance sensor (only if we have valid distance values)
+            if len(raw_dist_values) > 0:
+                min_distance_sensor = np.argmin(raw_dist_values)
+                min_distance = raw_dist_values[min_distance_sensor]
+                # self.get_logger().info(f"Lowest distance sensor: {min_distance_sensor}")
 
-            if min_distance < self.max_distance:
-                msg = self.get_obstacle_pose(min_distance_sensor, all_sensor_points[min_distance_sensor])
-                self.obstacle_pub.publish(msg)
+                if min_distance < self.max_distance:
+                    msg = self.get_obstacle_pose(min_distance_sensor, all_sensor_points[min_distance_sensor])
+                    self.obstacle_pub.publish(msg)
+                else:
+                    zero_pose = PoseStamped()
+                    zero_pose.header.stamp = self.get_clock().now().to_msg()
+                    zero_pose.header.frame_id = 'map'
+                    zero_pose.pose.position.x = 100.0
+                    zero_pose.pose.position.y = 0.0
+                    zero_pose.pose.position.z = 0.0
+                    self.obstacle_pub.publish(zero_pose)
             else:
+                # No sensor data processed, publish default "no obstacle" pose
                 zero_pose = PoseStamped()
                 zero_pose.header.stamp = self.get_clock().now().to_msg()
                 zero_pose.header.frame_id = 'map'

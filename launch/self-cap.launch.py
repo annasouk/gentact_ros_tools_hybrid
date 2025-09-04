@@ -80,31 +80,40 @@ def build_prediction_nodes(config, sensor_key, sensor_config):
     # Add prediction nodes if active
     if 'prediction' in config and config['prediction'].get('active', False):
         prediction_config = config['prediction']
-
-        # tracking_node = Node(
-        #     package='gentact_ros_tools',
-        #     executable='sensor_tracking_pub',
-        #     name='sensor_tracking_pub',
-        #     output='screen'
-        # )
-        # prediction_nodes.append(tracking_node)
         
         # Add PCL prediction if active
         if prediction_config.get('pcl', {}).get('active', False):
             # Extract link name from sensor key (remove _skin suffix if present)
             link_name = sensor_key.replace('_skin', '')
+
+            if sensor_config.get('alpha', None) is not None:
+                alpha = sensor_config.get('alpha', None)
+            else:
+                alpha = prediction_config['pcl'].get('alpha', 0.003)
+
+            if sensor_config.get('max_distance', None) is not None:
+                max_distance = sensor_config.get('max_distance', None)
+            else:
+                max_distance = prediction_config['pcl'].get('max_distance', 0.1)
+            
+            # Build parameters dict, only including multiplier if it's defined
+            params = {
+                'frame_id': link_name,
+                'num_sensors': sensor_config.get('num_sensors', 0),
+                'skin_name': sensor_config.get('name', ''),
+                'alpha': alpha,
+                'max_distance': max_distance,
+            }
+            
+            # Only add multiplier parameter if it's actually defined in config
+            if 'multiplier' in sensor_config:
+                params['multiplier'] = sensor_config['multiplier']
             
             pcl_node = Node(
                 package='gentact_ros_tools',
                 executable='capacitive_pcl',
                 name=f'pcl_prediction_{link_name}',
-                parameters=[{
-                    'frame_id': link_name,
-                    'num_sensors': sensor_config.get('num_sensors', 0),
-                    'skin_name': sensor_config.get('name', ''),
-                    'alpha': prediction_config['pcl'].get('alpha', 0.003),
-                    'max_distance': prediction_config['pcl'].get('max_distance', 0.1),
-                }],
+                parameters=[params],
                 output='screen'
             )
             prediction_nodes.append(pcl_node)
@@ -136,6 +145,33 @@ def build_prediction_nodes(config, sensor_key, sensor_config):
                 output='screen'
             )
             prediction_nodes.append(mamba_node)
+
+        if prediction_config.get('tracking', {}).get('active', False):
+            tracking_node = Node(
+                package='gentact_ros_tools',
+                executable='sensor_tracking_pub',
+                name=f'sensor_tracking_pub_{link_name}',
+                parameters=[{
+                    'skin_name': sensor_config.get('name', ''),
+                    'Kp': prediction_config['tracking'].get('Kp', 0.15),
+                    'Kd': prediction_config['tracking'].get('Kd', 0.001),
+                    'baseline_kp': prediction_config['tracking'].get('baseline_kp', 0.01),
+                    'baseline_ki': prediction_config['tracking'].get('baseline_ki', 0.0000001),
+                    'baseline_kd': prediction_config['tracking'].get('baseline_kd', 0.000001),
+                    'baseline_timeout': prediction_config['tracking'].get('baseline_timeout', 10.0),
+                    'masking_threshold': prediction_config['tracking'].get('masking_threshold', 200.0),
+                }],
+                output='screen'
+            )
+            prediction_nodes.append(tracking_node)
+
+        aggregated_obstacles_node = Node(
+            package='gentact_ros_tools',
+            executable='closest_obstacle',
+            name=f'closest_obstacle_pub',
+            output='screen'
+        )
+        prediction_nodes.append(aggregated_obstacles_node)
     
     return prediction_nodes
 
