@@ -2,6 +2,11 @@
 
 Install this ros2 package to visualize GenTact sensors as URDFs
 
+# To 
+```bash
+ros2 launch gentact_ros_tools spad2.launch.py config:=spad.yaml
+```
+
 # To visualize the sensor on its own:
 ```bash
 ros2 launch gentact_ros_tools self-cap
