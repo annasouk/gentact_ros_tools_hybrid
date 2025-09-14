@@ -315,6 +315,8 @@ class CapacitivePCL(Node):
                 #     self._debug_values_per_sensor[i].append(float(distance))
 
                 # Create pointcloud for this sensor
+                
+                
                 # Copy base points and offset them by the distance in Z
                 sensor_points = np.array([0.0, 0.0, 0.0])
                 

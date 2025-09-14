@@ -28,7 +28,7 @@ def generate_launch_description():
             # ' link3_skin:=', link3_skin, 
             # ' link4_skin:=', link4_skin, 
             ' link5_skin:=', link5_skin,
-            ' link6_skin:=', link6_skin,
+            #' link6_skin:=', link6_skin,
             #' ee_mesh_file:=', ee_mesh_file
             ]),  
         value_type=str
@@ -87,12 +87,12 @@ def generate_launch_description():
             default_value='false',
             description='Use simulation (Gazebo) clock if true'
         ),
-        foxglove_bridge,
+        # foxglove_bridge,
         TimerAction(period=1.0, actions=[rviz_node]),
         TimerAction(period=1.0, actions=[robot_state_publisher_node]),
         TimerAction(period=1.0, actions=[joint_state_publisher_node]),
         TimerAction(period=1.0, actions=[robot_st_base_node]),
-        # TimerAction(period=1.0, actions=[tof_listener]),
-        # TimerAction(period=1.0, actions=[pointcloud_talker]),
+        TimerAction(period=1.0, actions=[tof_listener]),
+        TimerAction(period=1.0, actions=[pointcloud_talker]),
 
     ])

@@ -6,12 +6,12 @@
   <xacro:macro name="link5_skin" params="parent namespace">
     <!-- Properties -->
     <xacro:property name="use_mesh_file" value="true" />
-    <xacro:property name="mesh_file" value="package://gentact_ros_tools/meshes/skin/link5_spad.stl" />
+    <xacro:property name="mesh_file" value="package://gentact_ros_tools/meshes/skin/spad/link5_spad.stl" />
     <xacro:property name="mass" value="0.3" /> <!-- [kg] -->
     <xacro:property name="body_width" value="0.3" /> <!-- [m] -->
     <xacro:property name="body_height" value="0.1" /> <!-- [m] -->
     <xacro:property name="sensor_length" value="0.05" /> <!-- [m] -->
-    <xacro:property name="sensor_radius" value="0.0" /> <!-- [m] -->
+    <xacro:property name="sensor_radius" value="0.005" /> <!-- [m] -->
 
     <!-- Included URDF Files -->
     <xacro:include filename="$(find gentact_ros_tools)/urdf/skin/self-cap-base.xacro" />
