@@ -54,17 +54,35 @@ def build_sensor_nodes(config):
     # Loop through all sensors in the config
     for sensor_key, sensor_config in config['sensors'].items():
         if isinstance(sensor_config, dict) and sensor_config.get('active', False):
-            # Create a sensor publisher node for each active sensor
-            sensor_node = Node(
-                package='gentact_ros_tools',
-                executable='tof_pub_pc',
-                name=f'{sensor_key}_publisher',
-                output='screen',
-                parameters=[{
-                    'num_sensors': sensor_config.get('num_sensors', 8),
-                    'publish_rate': config['sensors'].get('publish_rate', 30.0),
-                }]
-            )
+
+            if sensor_config.get('type', '') == "SPAD":
+                # Create a sensor publisher node for each active sensor
+                sensor_node = Node(
+                    package='gentact_ros_tools',
+                    executable='tof_pub_pc',
+                    name=f'{sensor_key}_publisher',
+                    output='screen',
+                    parameters=[{
+                        'num_sensors': sensor_config.get('num_sensors', 8),
+                        'publish_rate': config['sensors'].get('publish_rate', 30.0),
+                    }]
+                )
+            elif sensor_config.get('type', '') == "SCPS":
+                link_name = sensor_key.replace('_skin', '')
+                sensor_node = Node(
+                    package='gentact_ros_tools',
+                    executable='sensor_publisher',
+                    name=f'{sensor_key}_publisher',
+                    parameters=[{
+                        'serial_port': sensor_config.get('port', '/dev/ttyACM0'),
+                        'wireless': sensor_config.get('wireless', False),
+                        'link_name': link_name,
+                        'publish_rate': config['sensors'].get('publish_rate', 30.0),
+                        'num_sensors': sensor_config.get('num_sensors', 0),
+                        'skin_name': link_name,
+                    }],
+                    output='screen'
+                )
             sensor_nodes.append(sensor_node)
 
             # udp_node = Node(
@@ -107,7 +125,7 @@ def build_prediction_nodes(config, sensor_key, sensor_config):
             params = {
                 'frame_id': link_name,
                 'num_sensors': sensor_config.get('num_sensors', 0),
-                'skin_name': sensor_config.get('name', ''),
+                'skin_name': link_name,
                 'alpha': alpha,
                 'max_distance': max_distance,
             }
@@ -127,13 +145,13 @@ def build_prediction_nodes(config, sensor_key, sensor_config):
         
     
 
-        # aggregated_obstacles_node = Node(
-        #     package='gentact_ros_tools',
-        #     executable='closest_obstacle',
-        #     name=f'closest_obstacle_pub',
-        #     output='screen'
-        # )
-        # prediction_nodes.append(aggregated_obstacles_node)
+        aggregated_obstacles_node = Node(
+            package='gentact_ros_tools',
+            executable='closest_obstacle',
+            name=f'closest_obstacle_pub',
+            output='screen'
+        )
+        prediction_nodes.append(aggregated_obstacles_node)
     
     return prediction_nodes
 
@@ -271,9 +289,9 @@ def launch_setup(context, *args, **kwargs):
     # Build prediction nodes for each active sensor
     prediction_nodes = []
     for sensor_key, sensor_config in config['sensors'].items():
-        if isinstance(sensor_config, dict) and sensor_config.get('active', False):
-            # sensor_prediction_nodes = build_prediction_nodes(config, sensor_key, sensor_config)
-            # prediction_nodes.extend(sensor_prediction_nodes)
+        if isinstance(sensor_config, dict) and sensor_config.get('active', False) and sensor_config.get('type', '') == "SCPS":
+            sensor_prediction_nodes = build_prediction_nodes(config, sensor_key, sensor_config)
+            prediction_nodes.extend(sensor_prediction_nodes)
             pass
     
     viz_nodes = build_viz_nodes(config)

@@ -23,6 +23,7 @@ class ObstacleAggregatorNode(Node):
         
         # Define the active link names based on collision.yaml config
         self.active_links = ['link2', 'link3', 'link4', 'link5', 'link6']
+        # self.active_links = range(8)
         
         # Storage for latest obstacle points from each link
         self.latest_obstacles = {}

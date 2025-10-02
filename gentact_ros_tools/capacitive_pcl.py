@@ -146,6 +146,12 @@ class CapacitivePCL(Node):
                 1
             )
 
+            # self.obstacle_pub = self.create_publisher(
+            #     PoseStamped,
+            #     f'/obstacle',
+            #     1
+            # )
+
             self.baseline_sub = self.create_subscription(
                 Int32MultiArray,
                 f'/sensor_baseline_{self.skin_name}',
