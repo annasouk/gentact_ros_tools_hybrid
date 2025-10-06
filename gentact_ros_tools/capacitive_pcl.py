@@ -4,7 +4,7 @@ from rclpy.node import Node
 from rclpy.publisher import Publisher
 from rclpy.duration import Duration
 from geometry_msgs.msg import PoseStamped
-from std_msgs.msg import Int32MultiArray, Float64, Float64MultiArray
+from std_msgs.msg import Int32MultiArray, Float64, Float64MultiArray, Bool
 from sensor_msgs.msg import PointCloud2, PointField
 import numpy as np
 import struct
@@ -103,6 +103,19 @@ class CapacitivePCL(Node):
                 self.baseline_callback,
                 1
             )
+
+            self.status_pub = self.create_publisher(
+                Bool,
+                '/sensor_status',
+                1
+            )
+
+            self.tracking_status_sub = self.create_subscription(
+                Bool,
+                '/sensor_tracking_status',
+                self.tracking_status_callback,
+                1
+            )
         else:
             self.tuning_sub = self.create_subscription(
                 Float64,
@@ -159,6 +172,19 @@ class CapacitivePCL(Node):
                 1
             )
 
+            self.status_pub = self.create_publisher(
+                Bool,
+                f'/sensor_status_{self.skin_name}',
+                1
+            )
+
+            self.tracking_status_sub = self.create_subscription(
+                Bool,
+                f'/sensor_tracking_status_{self.skin_name}',
+                self.tracking_status_callback,
+                1
+            )
+
         
         # Initialize base pointcloud pattern (small grid)
         self.base_points = self.generate_base_points()
@@ -169,6 +195,17 @@ class CapacitivePCL(Node):
         # Debug accumulation for per-second stats
         self._debug_values_per_sensor = [[] for _ in range(self.num_sensors)]
         # self._debug_timer = self.create_timer(1.0, self._emit_debug_stats)
+
+        self.status_pub.publish(Bool(data=True))
+        self.heartbeat_timer = self.create_timer(3.0, self.heartbeat_publisher)
+        self.status = True
+
+    def tracking_status_callback(self, msg: Bool):
+        self.using_tracked_data = msg.data
+
+    def heartbeat_publisher(self):
+        self.status_pub.publish(Bool(data=self.status))
+        self.status = False
 
     def tuning_callback(self, msg: Float64):
         self.alpha = float(msg.data)
@@ -184,8 +221,9 @@ class CapacitivePCL(Node):
     def tracking_callback(self, msg: Int32MultiArray):
         """Handle tracking data - switch to tracked mode and process"""
         if not self.using_tracked_data:
-            self.using_tracked_data = True
-            self.get_logger().info("Switched to using tracked sensor data")
+            return
+            # self.using_tracked_data = True
+            # self.get_logger().info("Switched to using tracked sensor data")
         
         self.sensor_callback(msg)
     
@@ -230,19 +268,20 @@ class CapacitivePCL(Node):
             PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
             PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
             PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
+            PointField(name='intensity', offset=12, datatype=PointField.FLOAT32, count=1),
         ]
         
         # Set up the cloud data
         msg.height = 1
         msg.width = 1
-        msg.point_step = 12  # 3 floats * 4 bytes
+        msg.point_step = 16  # 4 floats * 4 bytes (x, y, z, intensity)
         msg.row_step = msg.point_step * msg.width
         msg.is_bigendian = False
         msg.is_dense = True
         
         # Pack the data
         buffer = []
-        buffer.append(struct.pack('fff', point[0], point[1], point[2]))
+        buffer.append(struct.pack('ffff', float(point[0]), float(point[1]), float(point[2]), float(point[3])))
         
         msg.data = b''.join(buffer)
         
@@ -260,12 +299,13 @@ class CapacitivePCL(Node):
             PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
             PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
             PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
+            PointField(name='intensity', offset=12, datatype=PointField.FLOAT32, count=1),
         ]
 
         if points.size == 0:
             msg.height = 1
             msg.width = 0
-            msg.point_step = 12
+            msg.point_step = 16
             msg.row_step = 0
             msg.is_bigendian = False
             msg.is_dense = True
@@ -275,14 +315,14 @@ class CapacitivePCL(Node):
         points = points.astype(np.float32)
         msg.height = 1
         msg.width = points.shape[0]
-        msg.point_step = 12
+        msg.point_step = 16
         msg.row_step = msg.point_step * msg.width
         msg.is_bigendian = False
         msg.is_dense = True
 
         buffer = []
         for p in points:
-            buffer.append(struct.pack('fff', float(p[0]), float(p[1]), float(p[2])))
+            buffer.append(struct.pack('ffff', float(p[0]), float(p[1]), float(p[2]), float(p[3])))
         msg.data = b''.join(buffer)
         return msg
     
@@ -306,6 +346,7 @@ class CapacitivePCL(Node):
             all_sensor_points = []  # in sensor frames
             combined_points_map = []  # transformed to output frame
             raw_dist_values = []
+            self.status = True
             
             for i in range(num_available):
                 # Get distance value and convert to meters
@@ -473,6 +514,7 @@ class CapacitivePCL(Node):
             # Apply rotation first, then translation
             rotated_point = rotation_matrix @ point
             transformed_point = rotated_point + np.array([t.x, t.y, t.z])
+            transformed_point = np.append(transformed_point, point[2])
             
             return transformed_point
 

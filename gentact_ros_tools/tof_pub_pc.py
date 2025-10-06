@@ -5,16 +5,16 @@
 import rclpy
 from rclpy.node import Node
 from sensor_msgs.msg import PointCloud2, PointField, Image 
-from std_msgs.msg import Header, UInt16MultiArray
+from std_msgs.msg import Header, UInt16MultiArray, Bool
 from std_msgs.msg import String
 from sensor_msgs_py import point_cloud2
 import numpy as np 
 import sys
 import copy
 import time
-from websocket import create_connection
 from geometry_msgs.msg import PoseStamped
 from tf2_ros import TransformListener, Buffer
+from time import sleep
 
 
 class MinimalPublisher(Node):
@@ -29,6 +29,7 @@ class MinimalPublisher(Node):
 
         self.pc_publisher = self.create_publisher(PointCloud2, 'sensor_pc_data', 10)
         self.pos_publisher = self.create_publisher(PointCloud2, 'sensor_pos', 10)
+        self.status_pub = self.create_publisher(Bool, 'sensor_status_link5', 1)
 
         self.tf_buffer = Buffer()
         self.tf_listener = TransformListener(self.tf_buffer, self)
@@ -59,6 +60,13 @@ class MinimalPublisher(Node):
         
         obstacle_hz = self.publish_rate
         self.obstacle_timer = self.create_timer(1/obstacle_hz, self.obstacle_callback)
+        self.status_pub.publish(Bool(data=True))
+        self.heartbeat_timer = self.create_timer(3.0, self.heartbeat_publisher)
+        self.status = True
+
+    def heartbeat_publisher(self):
+        self.status_pub.publish(Bool(data=self.status))
+        self.status = False
 
     def obstacle_callback(self):
         # Find the closest point among all sensors
@@ -66,8 +74,9 @@ class MinimalPublisher(Node):
         
         if not valid_points:
             print("No valid points available yet")
+            sleep(3)
             return  # No valid points available yet
-        
+
         # Convert to numpy array for easier processing
         points_array = np.array(valid_points)
         
@@ -120,6 +129,7 @@ class MinimalPublisher(Node):
 
     def make_tof_callback(self, idx):
         def callback(msg):
+            self.status = True
             
             
             # print(idx)
