@@ -57,6 +57,7 @@ setup(
             'closest_obstacle = gentact_ros_tools.closest_obstacle:main',
             'tof_pub_pc = gentact_ros_tools.tof_pub_pc:main',
             'franka_ros2_controller = gentact_ros_tools.franka_ros2_controller:main',
+            'joint_states_monitor = gentact_ros_tools.joint_states_monitor:main',
         ],
     },
 )

@@ -1,7 +1,7 @@
 robot:
   arm_id: "fr3"
   joint_relay: false
-  joint_publisher: false
+  joint_publisher: true
   robot_ip: "192.168.0.198" # Only used for joint relay. Ignore if joint relay is false.
   robot_xacro: "urdf/robot/fr3_full_skin.xacro" # Make sure the skin xacros are included in this file!
   end_effector:

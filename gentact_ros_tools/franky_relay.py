@@ -1,4 +1,4 @@
-#! /usr/bin/env python3
+#!/tmp/franky_repo/venv-franky/bin/python3
 
 import sys
 import os
