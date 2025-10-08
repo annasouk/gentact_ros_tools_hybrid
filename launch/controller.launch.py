@@ -60,10 +60,10 @@ def build_robot(config, use_sim_time, robot_description):
         name=f'{config["robot"]["arm_id"]}_robot_state_publisher',
         output='screen',
         parameters=[{'use_sim_time': use_sim_time, 'robot_description': robot_description}],
-        # remappings=[
-        #     ('/joint_states', '/joint_states_fr3'),
-        #     ('/robot_description', '/robot_description_fr3')
-        # ]
+        remappings=[
+            ('/joint_states', '/joint_states_fr3'),
+            ('/robot_description', '/robot_description_fr3')
+        ]
     ))
     robot_nodes.append(Node(
         package='tf2_ros',
@@ -135,19 +135,20 @@ def build_sensor_nodes(config, sensor_port_mapping):
 
                 print(f"SCPS Sensor publisher for {sensor_key} built")
             sensor_nodes.append(sensor_node)
-
-            # udp_node = Node(
-            #     package='udp_tof_listener',
-            #     executable='udp_grid_listener_array',
-            #     name=f'{sensor_key}_udp_listener',
-            #     output='screen',
-            #     parameters=[{
-            #         'num_sensors': sensor_config.get('num_sensors', 8),
-            #     }]
-            # )
-            # sensor_nodes.append(udp_node)
-    
     return sensor_nodes
+
+def build_udp_listener_nodes(config):
+    udp_listener_nodes = []
+    for sensor_key, sensor_config in config['sensors'].items():
+        if isinstance(sensor_config, dict) and sensor_config.get('type', '') == "SPAD" and sensor_config.get('active', False):
+            udp_listener_nodes.append(Node(
+                package='udp_tof_listener',
+                executable='udp_grid_listener_array',
+                name='udp_listener',
+                output='screen'
+            ))
+    return udp_listener_nodes
+
 
 def build_prediction_nodes(config, sensor_key, sensor_config):
     # Prediction nodes based on config for a specific sensor
@@ -248,21 +249,20 @@ def build_joint_relay_nodes(config):
         #     }]
         # ))
 
-        # joint_relay_nodes.append(Node( # Relays /joint_states to the robot's namespace
-        #     package='gentact_ros_tools',
-        #     executable='panda2fr3',
-        #     name='panda2fr3',
-        #     output='screen',
-        #     parameters=[{
-        #         'arm_id': config['robot']['arm_id'],
-        #     }]
-        # ))
+        joint_relay_nodes.append(Node( # Relays /joint_states to the robot's namespace
+            package='gentact_ros_tools',
+            executable='panda2fr3',
+            name='panda2fr3',
+            output='screen',
+            parameters=[{
+                'arm_id': config['robot']['arm_id'],
+            }]
+        ))
 
         if config['robot']['joint_publisher']:
             joint_relay_nodes.append(Node( # Relays /joint_states to the robot's namespace
                 package='joint_state_publisher_gui',
                 executable='joint_state_publisher_gui',
-                condition=LaunchConfiguration('use_gui'),
                 name='joint_state_publisher_gui'
             ))
 
@@ -363,7 +363,7 @@ def launch_setup(context, *args, **kwargs):
     viz_nodes = build_viz_nodes(config)
     camera_nodes = build_cameras_nodes(config)
     joint_relay_nodes = build_joint_relay_nodes(config)
-
+    udp_listener_nodes = build_udp_listener_nodes(config)
     timer_period = 0.0
     timer_period_delay = 0.0
 
@@ -402,6 +402,11 @@ def launch_setup(context, *args, **kwargs):
     for tracker_node in tracker_nodes:
         launch_actions.append(TimerAction(period=timer_period, actions=[tracker_node]))
         timer_period += timer_period_delay
+
+    # Add udp listener nodes with delays
+    for udp_listener_node in udp_listener_nodes:
+        launch_actions.append(TimerAction(period=timer_period, actions=[udp_listener_node]))
+        timer_period += timer_period_delay+20.0
 
     #print("Running ros1_ros2_bridge")
     #ros1_ros2_bridge()

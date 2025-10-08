@@ -131,65 +131,69 @@ class MinimalPublisher(Node):
         def callback(msg):
             self.status = True
             
+            try:
             
-            # print(idx)
-            # print(msg.data)
-            data_grid_8x8 = np.array(msg.data, dtype=np.uint16).reshape(8, 8)
-            #flips the array
-            data_grid_8x8 = data_grid_8x8[::-1,:]
+                # print(idx)
+                # print(msg.data)
+                data_grid_8x8 = np.array(msg.data, dtype=np.uint16).reshape(8, 8)
+                #flips the array
+                data_grid_8x8 = data_grid_8x8[::-1,:]
 
-            #detection angle
-            #view page 4 of https://www.st.com/resource/en/datasheet/vl53l5cx.pdf
-            fov_angle = 45.0*(np.pi/180.0)
-            mid_fov_angle = fov_angle/2.0
-            angles_x = np.array([np.linspace(-mid_fov_angle, mid_fov_angle, 8)])
-            angles_y = np.array([np.linspace(mid_fov_angle, -mid_fov_angle, 8)])
-            angles_X, angles_Y = np.meshgrid(angles_x, angles_y)
-            
-            #normalize distance from sensor measurement by 4 m
-            #b/c max distance sensor can read is 4m
-            z_offset = (data_grid_8x8.astype(np.float64) / 1000) 
-            z_offset[z_offset == 0.0] = 4.0
-            x_offset, y_offset = self.calculate_grid_size(z_offset, angles_X, angles_Y)
+                #detection angle
+                #view page 4 of https://www.st.com/resource/en/datasheet/vl53l5cx.pdf
+                fov_angle = 45.0*(np.pi/180.0)
+                mid_fov_angle = fov_angle/2.0
+                angles_x = np.array([np.linspace(-mid_fov_angle, mid_fov_angle, 8)])
+                angles_y = np.array([np.linspace(mid_fov_angle, -mid_fov_angle, 8)])
+                angles_X, angles_Y = np.meshgrid(angles_x, angles_y)
+                
+                #normalize distance from sensor measurement by 4 m
+                #b/c max distance sensor can read is 4m
+                z_offset = (data_grid_8x8.astype(np.float64) / 1000) 
+                z_offset[z_offset == 0.0] = 4.0
+                x_offset, y_offset = self.calculate_grid_size(z_offset, angles_X, angles_Y)
 
-            # FInd the closest point
-            # closest_point = np.argmin(z_offset)
-            closest_point = np.argmin(z_offset.flatten())
+                # FInd the closest point
+                # closest_point = np.argmin(z_offset)
+                closest_point = np.argmin(z_offset.flatten())
 
-            fields = [
-                PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
-                PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
-                PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
-                #below is distance data (mm) from sensor
-                PointField(name='intensity', offset=12, datatype=PointField.FLOAT32, count=1)
-            ]
+                fields = [
+                    PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
+                    PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
+                    PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
+                    #below is distance data (mm) from sensor
+                    PointField(name='intensity', offset=12, datatype=PointField.FLOAT32, count=1)
+                ]
 
-            #x_y_z_offset = np.dstack((x_offset, y_offset, z_offset, data_grid_8x8))
-            x_y_z_offset = np.dstack((x_offset, y_offset, z_offset, z_offset))
+                #x_y_z_offset = np.dstack((x_offset, y_offset, z_offset, data_grid_8x8))
+                x_y_z_offset = np.dstack((x_offset, y_offset, z_offset, z_offset))
 
-            #8 row x 8 col = 64 resolution 
-            sensor_pts = np.reshape(x_y_z_offset, (64, len(fields))).astype(np.float32)
-            # Find the index of the closest point (smallest z value)
-            closest_idx = np.argmin(sensor_pts[:, 2])
-            closest_point = sensor_pts[closest_idx, :3]  # x, y, z
-            self.closest_points[idx] = closest_point
-            itemsize = sensor_pts.itemsize
+                #8 row x 8 col = 64 resolution 
+                sensor_pts = np.reshape(x_y_z_offset, (64, len(fields))).astype(np.float32)
+                # Find the index of the closest point (smallest z value)
+                closest_idx = np.argmin(sensor_pts[:, 2])
+                closest_point = sensor_pts[closest_idx, :3]  # x, y, z
+                self.closest_points[idx] = closest_point
+                itemsize = sensor_pts.itemsize
 
-            pc_msg = PointCloud2(
-                #header=Header(frame_id=f'fr3_link5/sensor_{idx}'),
-                header=Header(frame_id=f'link5_sensor_{idx}'),
-                height=1,
-                width=sensor_pts.shape[0],
-                is_dense=False,
-                is_bigendian=sys.byteorder != 'little',
-                fields=fields,
-                point_step=(itemsize * len(fields)),
-                #point_step=16, uncomment this if above doesn't work 
-                row_step = (itemsize * len(fields) * sensor_pts.shape[0]),
-                #row_step=16 * sensor_pts.shape[0], uncomment if above doesn't work 
-                data=sensor_pts.tobytes()
-            )
-            self.pc_publishers[idx].publish(pc_msg)
+                pc_msg = PointCloud2(
+                    #header=Header(frame_id=f'fr3_link5/sensor_{idx}'),
+                    header=Header(frame_id=f'link5_sensor_{idx}'),
+                    height=1,
+                    width=sensor_pts.shape[0],
+                    is_dense=False,
+                    is_bigendian=sys.byteorder != 'little',
+                    fields=fields,
+                    point_step=(itemsize * len(fields)),
+                    #point_step=16, uncomment this if above doesn't work 
+                    row_step = (itemsize * len(fields) * sensor_pts.shape[0]),
+                    #row_step=16 * sensor_pts.shape[0], uncomment if above doesn't work 
+                    data=sensor_pts.tobytes()
+                )
+                self.pc_publishers[idx].publish(pc_msg)
+            except Exception as e:
+                self.get_logger().error(f'Error in make_tof_callback: {e}')
+                return
 
         return callback
     
