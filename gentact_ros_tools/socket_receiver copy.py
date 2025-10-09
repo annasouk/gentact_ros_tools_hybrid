@@ -45,7 +45,7 @@ class FrankySocketController:
         # Velocity smoothing
         self.velocity_history = deque(maxlen=5)
         self.last_velocity_command = np.zeros(7)
-        self.max_velocity_change = 0.3
+        self.max_velocity_change = 0.05
         self.command_count = 0
         
         # Latest joint states from socket
@@ -83,7 +83,7 @@ class FrankySocketController:
             smoothed_velocity = np.mean(list(self.velocity_history), axis=0)
         
         # Step 3: Velocity limiting
-        max_velocity = 0.8
+        max_velocity = 0.5
         smoothed_velocity = np.clip(smoothed_velocity, -max_velocity, max_velocity)
         
         self.last_velocity_command = smoothed_velocity

@@ -35,6 +35,14 @@ class JointStatesMonitor(Node):
             self.joint_states_callback,
             1
         )
+
+        # for i in range(7):
+        #     self.velocity_subscription = self.create_subscription(
+        #         JointState,
+        #         f'/panda_joint{i}_velocity/command',
+        #         self.velocity_callback_{i},
+        #         1
+        #     )
         
         # Timer to send at FIXED rate
         self.timer = self.create_timer(1.0 / self.publish_rate_hz, self.timer_callback)
@@ -66,7 +74,7 @@ class JointStatesMonitor(Node):
                 self.get_logger().info(f'✅ Client connected from {addr}')
             except BlockingIOError:
                 return  # No client yet
-        print(f"Time taken: {time.time() - start} seconds")
+        # print(f"Time taken: {time.time() - start} seconds")
         
         # Send latest state
         if self.latest_joint_state and self.client:

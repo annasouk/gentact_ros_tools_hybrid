@@ -74,7 +74,7 @@ class MinimalPublisher(Node):
         
         if not valid_points:
             print("No valid points available yet")
-            sleep(3)
+            # sleep(3)
             return  # No valid points available yet
 
         # Convert to numpy array for easier processing
@@ -84,21 +84,25 @@ class MinimalPublisher(Node):
         closest_idx = np.argmin(points_array[:, 2])
         closest_point = points_array[closest_idx]
 
-        map_transform = self.tf_buffer.lookup_transform(
-            "map",
-            f"link5_sensor_{closest_idx}",
-            rclpy.time.Time()
-        )
+        try:
+            map_transform = self.tf_buffer.lookup_transform(
+                "map",
+                f"link5_sensor_{closest_idx}",
+                rclpy.time.Time()
+            )
 
-        transformed_point = self._transform_point(closest_point, map_transform)
+            transformed_point = self._transform_point(closest_point, map_transform)
 
-        self.obstacle_msg = PoseStamped()
-        self.obstacle_msg.header.stamp = self.get_clock().now().to_msg()
-        self.obstacle_msg.header.frame_id = "map"
-        self.obstacle_msg.pose.position.x = float(transformed_point[0])
-        self.obstacle_msg.pose.position.y = float(transformed_point[1])
-        self.obstacle_msg.pose.position.z = float(transformed_point[2])
-        self.obstacle_pub.publish(self.obstacle_msg)
+            self.obstacle_msg = PoseStamped()
+            self.obstacle_msg.header.stamp = self.get_clock().now().to_msg()
+            self.obstacle_msg.header.frame_id = "map"
+            self.obstacle_msg.pose.position.x = float(transformed_point[0])
+            self.obstacle_msg.pose.position.y = float(transformed_point[1])
+            self.obstacle_msg.pose.position.z = float(transformed_point[2])
+            self.obstacle_pub.publish(self.obstacle_msg)
+        except Exception as e:
+            self.get_logger().error(f'Error in obstacle_callback: {e}')
+            return
 
     def _transform_point(self, point, transform):
             """Transform a point from sensor frame to map frame using rotation and translation."""
@@ -177,8 +181,8 @@ class MinimalPublisher(Node):
                 itemsize = sensor_pts.itemsize
 
                 pc_msg = PointCloud2(
-                    #header=Header(frame_id=f'fr3_link5/sensor_{idx}'),
                     header=Header(frame_id=f'link5_sensor_{idx}'),
+                    # header=Header(frame_id=f'link5_sensor_{idx}'),
                     height=1,
                     width=sensor_pts.shape[0],
                     is_dense=False,

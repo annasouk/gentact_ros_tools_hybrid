@@ -108,8 +108,6 @@ def build_sensor_nodes(config, sensor_port_mapping):
                 print(f"SPAD Sensor publisher for {sensor_key} built")
             elif sensor_config.get('type', '') == "SCPS":
                 link_name = sensor_key.replace('_skin', '')
-
-                print(sensor_port_mapping)
                 
                 # Use scanned port if available, otherwise fallback to config or default
                 serial_port = sensor_port_mapping.get(sensor_key, sensor_config.get('port', ''))
@@ -405,8 +403,8 @@ def launch_setup(context, *args, **kwargs):
 
     # Add udp listener nodes with delays
     for udp_listener_node in udp_listener_nodes:
-        launch_actions.append(TimerAction(period=timer_period, actions=[udp_listener_node]))
-        timer_period += timer_period_delay+20.0
+        launch_actions.append(TimerAction(period=timer_period+20.0, actions=[udp_listener_node]))
+        timer_period += timer_period_delay
 
     #print("Running ros1_ros2_bridge")
     #ros1_ros2_bridge()

@@ -41,6 +41,7 @@ class SensorTrackingPublisher(Node):
         self.baseline_values = np.zeros(self.num_sensors)
         self.baseline_samples = []
         self.sensor_data_received = False
+        self.sensor_values = np.zeros(self.num_sensors)
         
         # Initialize tracker state
         self.X = np.zeros(self.num_sensors)  # Current tracker state
@@ -108,6 +109,12 @@ class SensorTrackingPublisher(Node):
     
     def baseline_tracking_status_callback(self, msg: Bool):
         self.baseline_tracking_status = msg.data
+        # Set the baseline to the most recent sensor values
+        print("====== Activated Baseline Tracking ======")
+        print(f"Setting baseline to {self.sensor_values}")
+        self.baseline_values = self.sensor_values.copy() - self.baseline_values
+        self.baseline_collected = True
+        print("====== Baseline Collected ======")
     
     def check_sensor_timeout(self):
         """Check if we're stuck waiting for sensor data"""
@@ -290,6 +297,7 @@ class SensorTrackingPublisher(Node):
             self.tracking_publisher.publish(Int32MultiArray(
                     data=np.round(sensor_values).astype(int).tolist()
                 ))
+            self.sensor_values = sensor_values.copy()
 
 
 
