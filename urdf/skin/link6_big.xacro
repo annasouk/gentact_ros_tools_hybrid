@@ -38,7 +38,7 @@
       normal_x="-0.618"
       normal_y="-0.771"
       normal_z="-0.155">
-      <origin xyz="-0.0831 -0.0491 -0.0215" rpy="1.726 0.000 -0.676" />
+      <origin xyz="-0.0631 -0.0491 -0.0215" rpy="1.726 0.000 -0.676" />
     </xacro:self_cap_sensor>
     <xacro:self_cap_sensor
       robot_namespace="${namespace}"
@@ -49,7 +49,7 @@
       normal_x="-0.073"
       normal_y="-0.709"
       normal_z="0.702">
-      <origin xyz="-0.0553 -0.0490 0.0221" rpy="0.793 0.000 -0.103" />
+      <origin xyz="-0.0353 -0.0490 0.0221" rpy="0.793 0.000 -0.103" />
     </xacro:self_cap_sensor>
     <xacro:self_cap_sensor
       robot_namespace="${namespace}"
@@ -60,7 +60,7 @@
       normal_x="0.993"
       normal_y="-0.117"
       normal_z="0.014">
-      <origin xyz="0.0713 -0.0053 -0.0027" rpy="1.557 -0.000 1.454" />
+      <origin xyz="0.0913 -0.0053 -0.0027" rpy="1.557 -0.000 1.454" />
     </xacro:self_cap_sensor>
     <xacro:self_cap_sensor
       robot_namespace="${namespace}"
@@ -71,7 +71,7 @@
       normal_x="0.126"
       normal_y="-0.992"
       normal_z="0.008">
-      <origin xyz="-0.0122 -0.0561 -0.0028" rpy="1.563 -0.000 0.126" />
+      <origin xyz="0.0078 -0.0561 -0.0028" rpy="1.563 -0.000 0.126" />
     </xacro:self_cap_sensor>
     <xacro:self_cap_sensor
       robot_namespace="${namespace}"
@@ -82,7 +82,7 @@
       normal_x="0.280"
       normal_y="-0.960"
       normal_z="0.023">
-      <origin xyz="0.0375 -0.0444 -0.0024" rpy="1.548 -0.000 0.284" />
+      <origin xyz="0.0575 -0.0444 -0.0024" rpy="1.548 -0.000 0.284" />
     </xacro:self_cap_sensor>
     <xacro:self_cap_sensor
       robot_namespace="${namespace}"
@@ -93,7 +93,7 @@
       normal_x="0.055"
       normal_y="0.998"
       normal_z="0.042">
-      <origin xyz="0.0266 0.0474 0.0006" rpy="1.529 0.000 3.086" />
+      <origin xyz="0.0466 0.0474 0.0006" rpy="1.529 0.000 3.086" />
     </xacro:self_cap_sensor>
   </xacro:macro>
 
