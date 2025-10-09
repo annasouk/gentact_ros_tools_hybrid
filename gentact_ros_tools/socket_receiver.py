@@ -35,12 +35,16 @@ class FrankySocketController:
         self.dynamics_factor = 0.3
         self.motion_duration_ms = 200
         self.update_rate_hz = 50.0
+        self.control_dt = 1.0 / self.update_rate_hz
+        self.max_acceleration = 2.0  # rad/s^2 per joint (simple limiter)
         
         print(f"Controller gains:")
         print(f"  velocity_scaling = {self.velocity_scaling}")
         print(f"  dynamics_factor = {self.dynamics_factor}")
         print(f"  duration = {self.motion_duration_ms}ms")
         print(f"  rate = {self.update_rate_hz}Hz")
+        print(f"  accel_limit = {self.max_acceleration} rad/s^2")
+        print(f"  control_dt = {self.control_dt:.4f}s")
         
         # Velocity smoothing
         self.velocity_history = deque(maxlen=5)
@@ -69,11 +73,21 @@ class FrankySocketController:
             print(f"❌ ERROR: Could not connect to robot: {e}")
             raise
     
-    def smooth_velocity_command(self, raw_velocity):
+    def smooth_velocity_command(self, raw_velocity, dt=None):
         """Apply smoothing to velocity commands (same logic as franky_relay)"""
         # Step 1: Conservative velocity change limiting
+        if dt is None:
+            dt = self.control_dt
+        # guard against pathological dt values
+        if dt <= 0.0 or dt > 0.5:
+            dt = self.control_dt
+
         velocity_diff = raw_velocity - self.last_velocity_command
-        max_change = np.full(7, self.max_velocity_change)
+        # acceleration-based change limit per step
+        accel_limited_change = self.max_acceleration * dt
+        # combine with existing absolute per-step change limit
+        per_step_limit = min(self.max_velocity_change, accel_limited_change)
+        max_change = np.full(7, per_step_limit)
         clamped_diff = np.clip(velocity_diff, -max_change, max_change)
         smoothed_velocity = self.last_velocity_command + clamped_diff
         
@@ -115,8 +129,13 @@ class FrankySocketController:
             current_joints = np.array(self.robot.current_joint_state.position[:7])
             
             # Calculate velocity command
+            now = time.time()
+            prev = getattr(self, '_last_control_time', None)
+            dt = (now - prev) if prev is not None else self.control_dt
+            self._last_control_time = now
+
             raw_diff = (self.latest_joint_states - current_joints) * self.velocity_scaling
-            smoothed_diff = self.smooth_velocity_command(raw_diff)
+            smoothed_diff = self.smooth_velocity_command(raw_diff, dt=dt)
             
             # Skip very small movements
             # if np.linalg.norm(smoothed_diff) < 0.005:
