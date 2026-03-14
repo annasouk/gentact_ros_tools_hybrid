@@ -6,7 +6,7 @@
   <xacro:macro name="link6_skin" params="parent namespace">
     <!-- Properties -->
     <xacro:property name="use_mesh_file" value="true" />
-    <xacro:property name="mesh_file" value="package://gentact_descriptions/meshes/skin/hybrid/link6_hybrid_dermis.stl" />
+    <xacro:property name="mesh_file" value="package://gentact_descriptions_hybrid/meshes/skin/hybrid/link6_hybrid_dermis.stl" />
     <xacro:property name="mass" value="0.3" /> <!-- [kg] -->
     <xacro:property name="body_width" value="0.3" /> <!-- [m] -->
     <xacro:property name="body_height" value="0.1" /> <!-- [m] -->
@@ -14,7 +14,7 @@
     <xacro:property name="sensor_radius" value="0.0" /> <!-- [m] -->
 
     <!-- Included URDF Files -->
-    <xacro:include filename="$(find gentact_ros_tools)/urdf/skin/self-cap-base.xacro" />
+    <xacro:include filename="$(find gentact_ros_tools_hybrid)/urdf/skin/self-cap-base.xacro" />
     <!-- Instantiate dermis once -->
     <xacro:dermis_base_macro
       robot_namespace="${namespace}"

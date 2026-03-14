@@ -17,7 +17,7 @@ import glob
 import time
 
 def load_config(config_file_name, context):
-    package_share = FindPackageShare('gentact_ros_tools').perform(context)
+    package_share = FindPackageShare('gentact_ros_tools_hybrid').perform(context)
     config_file = os.path.join(package_share, 'config', config_file_name)
     
     with open(config_file, 'r') as file:
@@ -55,7 +55,7 @@ def build_robot_description(config):
         if ee_xacro:
             urdf_args.extend([' ee_xacro_file:=', ee_xacro])
     
-    urdf_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools'), config['robot']['robot_xacro']])
+    urdf_file = PathJoinSubstitution([FindPackageShare('gentact_ros_tools_hybrid'), config['robot']['robot_xacro']])
     xacro_command = ['xacro ', urdf_file] + urdf_args
     robot_description = ParameterValue(
         Command(xacro_command), 
@@ -102,7 +102,7 @@ def build_sensor_nodes(config, sensor_port_mapping):
             if sensor_config.get('type', '') == "SPAD":
                 # Create a sensor publisher node for each active sensor
                 sensor_node = Node(
-                    package='gentact_ros_tools',
+                    package='gentact_ros_tools_hybrid',
                     executable='tof_pub_pc',
                     name=f'{sensor_key}_publisher',
                     output='screen',
@@ -123,7 +123,7 @@ def build_sensor_nodes(config, sensor_port_mapping):
                     continue
                 
                 sensor_node = Node(
-                    package='gentact_ros_tools',
+                    package='gentact_ros_tools_hybrid',
                     executable='sensor_publisher',
                     name=f'{sensor_key}_publisher',
                     parameters=[{
@@ -192,7 +192,7 @@ def build_prediction_nodes(config, sensor_key, sensor_config):
                 params['multiplier'] = sensor_config['multiplier']
             
             pcl_node = Node(
-                package='gentact_ros_tools',
+                package='gentact_ros_tools_hybrid',
                 executable='capacitive_pcl',
                 name=f'pcl_prediction_{link_name}',
                 parameters=[params],
@@ -203,7 +203,7 @@ def build_prediction_nodes(config, sensor_key, sensor_config):
     
 
         aggregated_obstacles_node = Node(
-            package='gentact_ros_tools',
+            package='gentact_ros_tools_hybrid',
             executable='closest_obstacle',
             name=f'closest_obstacle_pub',
             output='screen'
@@ -230,7 +230,7 @@ def build_tracker_nodes(config, sensor_key, sensor_config):
                 'masking_threshold': config['tracker'].get('masking_threshold', 200.0),
             }
             tracker_node = Node(
-                package='gentact_ros_tools',
+                package='gentact_ros_tools_hybrid',
                 executable='sensor_tracking_pub',
                 name=f'sensor_tracking_pub_{sensor_key}',
                 output='screen',
@@ -243,7 +243,7 @@ def build_joint_relay_nodes(config):
     joint_relay_nodes = []
     if config['robot']['joint_relay']:
         # joint_relay_nodes.append(Node( # Controls the franka to mimic /joint_states_{arm_id}
-        #     package='gentact_ros_tools',
+        #     package='gentact_ros_tools_hybrid',
         #     executable='franky_relay',
         #     name='franky_relay',
         #     output='screen',
@@ -254,7 +254,7 @@ def build_joint_relay_nodes(config):
         # ))
 
         joint_relay_nodes.append(Node( # Relays /joint_states to the robot's namespace
-            package='gentact_ros_tools',
+            package='gentact_ros_tools_hybrid',
             executable='panda2fr3',
             name='panda2fr3',
             output='screen',
@@ -302,7 +302,7 @@ def build_tuner_nodes(config):
     tuner_nodes = []
     if config['avoidance']['active']:
         tuner_nodes.append(Node(
-            package='gentact_ros_tools',
+            package='gentact_ros_tools_hybrid',
             executable='tuner',
             name='rviz2',
             output='screen',
@@ -319,7 +319,7 @@ def build_cameras_nodes(config):
         cameras_launch = IncludeLaunchDescription(
             PythonLaunchDescriptionSource([
                 PathJoinSubstitution([
-                    FindPackageShare('gentact_ros_tools'),
+                    FindPackageShare('gentact_ros_tools_hybrid'),
                     'launch',
                     cameras_launch_file
                 ])

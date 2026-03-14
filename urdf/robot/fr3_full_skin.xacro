@@ -6,10 +6,10 @@
 <robot name="fr3" xmlns:xacro="http://ros.org/wiki/xacro">
   <!-- safety_distance: Minimum safety distance in [m] by which the collision volumes are expanded and which is enforced during robot motions -->
   <!-- arm_id: Namespace of the robot arm. Serves to differentiate between arms in case of multiple instances. -->
-  <!-- joint_limits: description of the joint limits that comes from a YAML file. Example definition: ${xacro.load_yaml('$(find gentact_ros_tools)/robots/fr3/joint_limits.yaml')} -->
-  <!-- kinematics: description of the kinematics that comes from a YAML file. Example definition: ${xacro.load_yaml('$(find gentact_ros_tools)/robots/fr3/kinematics.yaml')} -->
-  <!-- inertials: description of the inertials that comes from a YAML file. Example definition: ${xacro.load_yaml('$(find gentact_ros_tools)/robots/fr3/inertials.yaml')} -->
-  <!-- dynamics: description of the dynamics that comes from a YAML file. Example definition: ${xacro.load_yaml('$(find gentact_ros_tools)/robots/fr3/dynamics.yaml')} -->
+  <!-- joint_limits: description of the joint limits that comes from a YAML file. Example definition: ${xacro.load_yaml('$(find gentact_ros_tools_hybrid)/robots/fr3/joint_limits.yaml')} -->
+  <!-- kinematics: description of the kinematics that comes from a YAML file. Example definition: ${xacro.load_yaml('$(find gentact_ros_tools_hybrid)/robots/fr3/kinematics.yaml')} -->
+  <!-- inertials: description of the inertials that comes from a YAML file. Example definition: ${xacro.load_yaml('$(find gentact_ros_tools_hybrid)/robots/fr3/inertials.yaml')} -->
+  <!-- dynamics: description of the dynamics that comes from a YAML file. Example definition: ${xacro.load_yaml('$(find gentact_ros_tools_hybrid)/robots/fr3/dynamics.yaml')} -->
   
   <!-- Define arguments for skin configurations -->
   <xacro:arg name="link1_skin" default=""/>
@@ -32,12 +32,12 @@
   <link name="fr3_link0">
     <visual name="fr3_link0_visual">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/visual/link0.dae"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/visual/link0.dae"/>
       </geometry>
     </visual>
     <collision name="fr3_link0_collision">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/collision/link0.stl"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/collision/link0.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -50,12 +50,12 @@
   <link name="fr3_link1">
     <visual name="fr3_link1_visual">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/visual/link1.dae"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/visual/link1.dae"/>
       </geometry>
     </visual>
     <collision name="fr3_link1_collision">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/collision/link1.stl"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/collision/link1.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -84,12 +84,12 @@
   <link name="fr3_link2">
     <visual name="fr3_link2_visual">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/visual/link2.dae"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/visual/link2.dae"/>
       </geometry>
     </visual>
     <collision name="fr3_link2_collision">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/collision/link2.stl"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/collision/link2.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -118,12 +118,12 @@
   <link name="fr3_link3">
     <visual name="fr3_link3_visual">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/visual/link3.dae"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/visual/link3.dae"/>
       </geometry>
     </visual>
     <collision name="fr3_link3_collision">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/collision/link3.stl"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/collision/link3.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -152,12 +152,12 @@
   <link name="fr3_link4">
     <visual name="fr3_link4_visual">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/visual/link4.dae"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/visual/link4.dae"/>
       </geometry>
     </visual>
     <collision name="fr3_link4_collision">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/collision/link4.stl"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/collision/link4.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -186,12 +186,12 @@
   <link name="fr3_link5">
     <visual name="fr3_link5_visual">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/visual/link5.dae"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/visual/link5.dae"/>
       </geometry>
     </visual>
     <collision name="fr3_link5_collision">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/collision/link5.stl"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/collision/link5.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -227,12 +227,12 @@
   <link name="fr3_link6">
     <visual name="fr3_link6_visual">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/visual/link6.dae"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/visual/link6.dae"/>
       </geometry>
     </visual>
     <collision name="fr3_link6_collision">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/collision/link6.stl"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/collision/link6.stl"/>
       </geometry>
     </collision>
     <inertial>
@@ -262,12 +262,12 @@
   <link name="fr3_link7">
     <visual name="fr3_link7_visual">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/visual/link7.dae"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/visual/link7.dae"/>
       </geometry>
     </visual>
     <collision name="fr3_link7_collision">
       <geometry>
-        <mesh filename="package://gentact_ros_tools/meshes/robot_arms/fr3/collision/link7.stl"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/robot_arms/fr3/collision/link7.stl"/>
       </geometry>
     </collision>
     <inertial>
