@@ -17,6 +17,8 @@ controller:
 sensors:
   active: true
   publish_rate: 30.0 # Hz
+  multicast_group: '239.0.0.1'
+  multicast: true
 
   # All links defined as in xacro: i.e. '${robot.arm_id}_${link_name}' -> 'fr3_link1'
   # Launch will search for these links and activate if they are found in the xacro file.

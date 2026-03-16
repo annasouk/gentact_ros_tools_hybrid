@@ -113,6 +113,7 @@ def build_sensor_nodes(config, sensor_port_mapping):
                         'udp_port' : sensor_config.get('port'),
                         'link' : link_id,
                         'multicast' : True,
+                        'multicast_group': config['sensors'].get('multicast_group', None),
                         'num_sensors': sensor_config.get('num_sensors', 8),
                         #'publish_rate': config['sensors'].get('publish_rate', 30.0),
                     }]

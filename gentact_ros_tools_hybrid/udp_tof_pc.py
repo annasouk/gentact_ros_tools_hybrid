@@ -17,9 +17,9 @@ class UDP_PC_Publisher(Node):
         sock.bind(("0.0.0.0", port))
 
         if self.multicast:
-            mreq = struct.pack('4sL', socket.inet_aton(MULTICAST_GROUP), socket.INADDR_ANY)
+            mreq = struct.pack('4sL', socket.inet_aton(self.multicast_group), socket.INADDR_ANY)
             sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
-            print(f"  [multicast] Joined group {MULTICAST_GROUP} on port {port}")
+            print(f"  [multicast] Joined group {self.multicast_group} on port {port}")
         return sock
     
     def __init__(self):
@@ -34,6 +34,7 @@ class UDP_PC_Publisher(Node):
         #self.declare_parameter('max_devices', 10)  # Maximum number of devices to track
         self.declare_parameter('unicast',False)
         self.declare_parameter('multicast',False)
+        self.declare_parameter('multicast_group',None)
         
         # Get parameters
         self.udp_port = self.get_parameter('udp_port').get_parameter_value().integer_value
@@ -45,6 +46,7 @@ class UDP_PC_Publisher(Node):
         #self.max_devices = self.get_parameter('max_devices').get_parameter_value().integer_value
         self.unicast = self.get_parameter('unicast').get_parameter_value().bool_value
         self.multicast = self.get_parameter('multicast').get_parameter_value().bool_value
+        self.multicast_group = self.get_parameter('multicast_group').get_parameter_value().string_value
 
         # Device tracking
         self.device_publishers = {}  # device_id -> publisher
