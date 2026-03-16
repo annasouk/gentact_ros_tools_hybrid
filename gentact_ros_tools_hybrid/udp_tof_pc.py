@@ -64,22 +64,19 @@ class UDP_PC_Publisher(Node):
             print(f"  [multicast] Joined group {MULTICAST_GROUP} on port {port}")
         return sock
 
-    def _get_or_create_publisher(self, device_id, sensor_id):
+    def _get_or_create_publisher(self, sensor_id):
         """Get existing publisher or create new one for device"""
-        if device_id not in self.device_publishers:
-            if len(self.device_publishers) >= self.max_devices:
-                self.get_logger().warn(f"Maximum devices ({self.max_devices}) reached, ignoring device {device_id}")
-                return None
-            
+        if sensor_id < self.num_sensors:
             # Create new publisher for this device
             topic_name = f'/hybrid/link_{self.link}_{sensor_id}'
             publisher = self.create_publisher(Int32MultiArray, topic_name, 1)
             pc_publisher = self.create_publisher(PointCloud2, topic_name, 1)
+            device_id = f'link{self.link}_sensor_{sensor_id}'
             self.device_publishers[device_id] = publisher
             self.device_last_seen[device_id] = time.time()
             self.device_receive_counts[device_id] = 0
             
-            self.get_logger().info(f"New device connected: {device_id:08x} -> {topic_name}")
+            self.get_logger().info(f"New device connected: {device_id} -> {topic_name}")
         
         return self.device_publishers[device_id]
     
@@ -141,6 +138,7 @@ class UDP_PC_Publisher(Node):
             
             return {
                 'sensor_id': sensor_id,
+                'device_id': f'link{self.link}_sensor_{sensor_id}'
                 'data': mm
             }
             
@@ -196,7 +194,7 @@ class UDP_PC_Publisher(Node):
             
             # Create PointCloud2 msg
             pc_msg = PointCloud2(
-                header=Header(frame_id=f'fr3_{self.link}/sensor_{sensor_id}'),
+                header=Header(frame_id=f'fr3_{self.link}/{self.link}_sensor_{sensor_id}'),
                 height=1,
                 width=sensor_pts.shape[0],
                 is_dense=False,
