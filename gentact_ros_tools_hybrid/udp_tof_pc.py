@@ -7,13 +7,13 @@ import struct
 import threading
 import time
 
-class UDPSensorPublisher(Node):
+class UDP_PC_Publisher(Node):
     def __init__(self):
-        super().__init__('udp_sensor_publisher')
+        super().__init__('udp_pointcloud_publisher')
         
         # Declare parameters
         self.declare_parameter('udp_port', 8888)
-        self.declare_parameter('buffer_size', 1024)
+        self.declare_parameter('buffer_size', 4096)
         self.declare_parameter('timeout_seconds', 5.0)
         self.declare_parameter('link','1')
         self.declare_parameter('num_sensors',1)
@@ -37,11 +37,7 @@ class UDPSensorPublisher(Node):
         self.device_receive_counts = {}  # device_id -> receive_count
         
         # UDP socket setup
-        self.socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        if self.
-        self.socket.bind(('', self.udp_port))
-        self.socket.settimeout(1.0)  # 1 second timeout
+        self.socket = _make_udp_socket(self.udp_port)
         
         # Threading
         self.running = True
@@ -55,7 +51,20 @@ class UDPSensorPublisher(Node):
         self.get_logger().info(f"UDP Sensor Publisher started on port {self.udp_port}")
         self.get_logger().info(f"Supporting up to {self.max_devices} devices")
     
-    def _get_or_create_publisher(self, device_id):
+    def _make_udp_socket(port):
+        sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+        sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 65536)
+        sock.setblocking(False)
+        sock.bind(("0.0.0.0", port))
+
+        if self.multicast:
+            mreq = struct.pack('4sL', socket.inet_aton(MULTICAST_GROUP), socket.INADDR_ANY)
+            sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
+            print(f"  [multicast] Joined group {MULTICAST_GROUP} on port {port}")
+        return sock
+
+    def _get_or_create_publisher(self, device_id, sensor_id):
         """Get existing publisher or create new one for device"""
         if device_id not in self.device_publishers:
             if len(self.device_publishers) >= self.max_devices:
@@ -63,8 +72,9 @@ class UDPSensorPublisher(Node):
                 return None
             
             # Create new publisher for this device
-            topic_name = f'/sensor_raw/device_{device_id:08x}'
+            topic_name = f'/hybrid/link_{self.link}_{sensor_id}'
             publisher = self.create_publisher(Int32MultiArray, topic_name, 1)
+            pc_publisher = self.create_publisher(PointCloud2, topic_name, 1)
             self.device_publishers[device_id] = publisher
             self.device_last_seen[device_id] = time.time()
             self.device_receive_counts[device_id] = 0
@@ -112,48 +122,26 @@ class UDPSensorPublisher(Node):
                 continue
     
     def _parse_sensor_data(self, data):
-        """Parse binary sensor data from ESP32"""
+        """
+        Parse binary sensor data from ESP32
+        
+        Packet layout: [1 byte sensor ID] [64 uint16_t filtered] [64 uint16_t raw]
+        """
+
         try:
-            # Expected structure: device_id(4) + num_sensors(4) + sensor_values(4*num_sensors)
-            if len(data) < 12:  # Minimum size (4+4+4)
+            # Expected structure: 
+            if len(data) < 4096 :  # Minimum size (4+4+4)
                 self.get_logger().warn(f"Received data too small: {len(data)} bytes")
                 return None
             
             # Unpack binary data
-            device_id = struct.unpack('<I', data[0:4])[0]
-            num_sensors = struct.unpack('<I', data[4:8])[0]
-            
-            # Validate number of sensors
-            if num_sensors > 8 or num_sensors <= 0:
-                self.get_logger().warn(f"Invalid sensor count: {num_sensors}")
-                return None
-            
-            # Validate device_id
-            if device_id == 0:
-                self.get_logger().warn("Invalid device_id: 0")
-                return None
-            
-            # Calculate expected data size
-            expected_size = 8 + (num_sensors * 4)  # header + sensor values
-            if len(data) < expected_size:
-                self.get_logger().warn(f"Data size mismatch: expected {expected_size}, got {len(data)}")
-                return None
-            
-            # Parse sensor values (each long is 4 bytes)
-            sensor_values = []
-            for i in range(num_sensors):
-                start_idx = 8 + (i * 4)
-                end_idx = start_idx + 4
-                if end_idx <= len(data):
-                    # Parse as long (32-bit integer) from ESP32
-                    value = struct.unpack('<l', data[start_idx:end_idx])[0]
-                    sensor_values.append(value)
+            sensor_id = np.frombuffer(data[0], dtype=np.uint16)
+            # Uses only filtered data for now  
+            mm = np.frombuffer(data[1:1 + NUM_PIXELS], dtype=np.uint16) / 1000.0
             
             return {
-                'device_id': device_id,
-                'num_sensors': num_sensors,
-                'sensor_values': sensor_values,
-                'raw_data': data
+                'sensor_id': sensor_id,
+                'data': mm
             }
             
         except struct.error as e:
@@ -163,20 +151,64 @@ class UDPSensorPublisher(Node):
             self.get_logger().error(f"Unexpected error parsing data: {e}")
             return None
     
-    def _publish_sensor_data(self, sensor_data, publisher):
+     def calculate_grid_size(self, dist, angles_X, angles_Y):
+
+        #return x and y offsets of grid
+        x_pos = np.sin(angles_X)*dist
+        y_pos = np.sin(angles_Y)*dist
+
+        return x_pos,y_pos
+    
+    def _publish_sensor_data(self, sensor_data, publisher,sensor_id):
         """Publish sensor data as ROS2 message"""
         try:
-            # Create Int32MultiArray message
-            msg = Int32MultiArray()
             
-            # Convert and clamp sensor values to valid int32 range
-            clamped_values = []
-            for value in sensor_data['sensor_values']:
-                # Clamp to int32 range [-2147483648, 2147483647]
-                clamped_value = max(-2147483648, min(2147483647, int(value)))
-                clamped_values.append(clamped_value)
+            data_grid_8x8 = np.array(msg.data, dtype=np.uint16).reshape(8, 8)
+            # flips the array
+            data_grid_8x8 = data_grid_8x8[::-1,:]
+
+            # Detection angle
+            # view page 4 of https://www.st.com/resource/en/datasheet/vl53l5cx.pdf
+            fov_angle = 45.0*(np.pi/180.0)
+            # angle is divided by 2 because solving sidelen of isoceles triangle 
+            mid_fov_angle = fov_angle/2.0 
+            angles_x = np.array([np.linspace(-mid_fov_angle, mid_fov_angle, 8)])
+            angles_y = np.array([np.linspace(mid_fov_angle, -mid_fov_angle, 8)])
+            angles_X, angles_Y = np.meshgrid(angles_x, angles_y)
             
-            msg.data = clamped_values
+            # Convert to meters
+            z_offset = (data_grid_8x8.astype(np.float64) / 1000.0) 
+            x_offset, y_offset = self.calculate_grid_size(z_offset, angles_X, angles_Y)
+
+            fields = [
+                PointField(name='x', offset=0, datatype=PointField.FLOAT32, count=1),
+                PointField(name='y', offset=4, datatype=PointField.FLOAT32, count=1),
+                PointField(name='z', offset=8, datatype=PointField.FLOAT32, count=1),
+                #below is distance data (mm) from sensor
+                PointField(name='intensity', offset=12, datatype=PointField.FLOAT32, count=1)
+            ]
+
+            x_y_z_offset = np.dstack((x_offset, y_offset, z_offset, z_offset))
+
+            #8 row x 8 col = 64 resolution 
+            sensor_pts = np.reshape(x_y_z_offset, (64, len(fields))).astype(np.float32)
+            itemsize = sensor_pts.itemsize
+            
+            # Create PointCloud2 msg
+            pc_msg = PointCloud2(
+                header=Header(frame_id=f'fr3_{self.link}/sensor_{sensor_id}'),
+                height=1,
+                width=sensor_pts.shape[0],
+                is_dense=False,
+                is_bigendian=sys.byteorder != 'little',
+                fields=fields,
+                point_step=(itemsize * len(fields)),
+                #point_step=16, uncomment this if above doesn't work 
+                row_step = (itemsize * len(fields) * sensor_pts.shape[0]),
+                #row_step=16 * sensor_pts.shape[0], uncomment if above doesn't work 
+                data=sensor_pts.tobytes()
+            )
+            self.pc_publishers[sensor_id].publish(pc_msg)
             
             # Publish
             publisher.publish(msg)
@@ -227,7 +259,7 @@ class UDPSensorPublisher(Node):
 def main(args=None):
     rclpy.init(args=args)
     
-    publisher = UDPSensorPublisher()
+    publisher = UDP_PC_Publisher()
     
     try:
         rclpy.spin(publisher)

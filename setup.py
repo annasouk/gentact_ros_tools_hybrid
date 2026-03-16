@@ -40,6 +40,7 @@ setup(
             'calibration_direct_pub = gentact_ros_tools_hybrid.calibration_direct_pub:main',
             'sensor_publisher = gentact_ros_tools_hybrid.sensor_publisher:main',
             'sensor_subscriber = gentact_ros_tools_hybrid.sensor_subscriber:main',
+            'pc_publisher = gentact_ros_tools_hybrid.udp_tof_pc:main',
             'capacitive_pcl = gentact_ros_tools_hybrid.capacitive_pcl:main',
             'tuner = gentact_ros_tools_hybrid.tuner:main',
             'sensor_tracking_pub = gentact_ros_tools_hybrid.sensor_tracking_pub:main',
