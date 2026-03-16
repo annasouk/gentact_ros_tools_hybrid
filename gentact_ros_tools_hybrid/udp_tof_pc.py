@@ -8,50 +8,8 @@ import threading
 import time
 
 class UDP_PC_Publisher(Node):
-    def __init__(self):
-        super().__init__('udp_pointcloud_publisher')
-        
-        # Declare parameters
-        self.declare_parameter('udp_port', 8888)
-        self.declare_parameter('buffer_size', 4096)
-        self.declare_parameter('timeout_seconds', 5.0)
-        self.declare_parameter('link','1')
-        self.declare_parameter('num_sensors',1)
-        self.declare_parameter('max_devices', 10)  # Maximum number of devices to track
-        self.declare_parameter('unicast',False)
-        self.declare_parameter('multicast',False)
-        
-        # Get parameters
-        self.udp_port = self.get_parameter('udp_port').get_parameter_value().integer_value
-        self.buffer_size = self.get_parameter('buffer_size').get_parameter_value().integer_value
-        self.timeout_seconds = self.get_parameter('timeout_seconds').get_parameter_value().double_value
-        self.buffer_size = self.get_parameter('num_sensors').get_parameter_value().integer_value
-        self.link = self.get_parameter('link').get_parameter_value().string_value
-        self.max_devices = self.get_parameter('max_devices').get_parameter_value().integer_value
-        self.unicast = self.get_parameter('unicast').get_parameter_value().bool_value
-        self.multicast = self.get_parameter('multicast').get_parameter_value().bool_value
-
-        # Device tracking
-        self.device_publishers = {}  # device_id -> publisher
-        self.device_last_seen = {}   # device_id -> last_receive_time
-        self.device_receive_counts = {}  # device_id -> receive_count
-        
-        # UDP socket setup
-        self.socket = _make_udp_socket(self.udp_port)
-        
-        # Threading
-        self.running = True
-        self.receive_thread = threading.Thread(target=self._receive_loop)
-        self.receive_thread.daemon = True
-        self.receive_thread.start()
-        
-        # Create timer for status updates
-        self.status_timer = self.create_timer(5.0, self._status_update)
-        
-        self.get_logger().info(f"UDP Sensor Publisher started on port {self.udp_port}")
-        self.get_logger().info(f"Supporting up to {self.max_devices} devices")
     
-    def _make_udp_socket(port):
+    def _make_udp_socket(self,port):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_RCVBUF, 65536)
@@ -63,7 +21,52 @@ class UDP_PC_Publisher(Node):
             sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
             print(f"  [multicast] Joined group {MULTICAST_GROUP} on port {port}")
         return sock
+    
+    def __init__(self):
+        super().__init__('udp_pointcloud_publisher')
+        
+        # Declare parameters
+        self.declare_parameter('udp_port', 8888)
+        self.declare_parameter('buffer_size', 4096)
+        self.declare_parameter('timeout_seconds', 5.0)
+        self.declare_parameter('link','1')
+        self.declare_parameter('num_sensors',1)
+        #self.declare_parameter('max_devices', 10)  # Maximum number of devices to track
+        self.declare_parameter('unicast',False)
+        self.declare_parameter('multicast',False)
+        
+        # Get parameters
+        self.udp_port = self.get_parameter('udp_port').get_parameter_value().integer_value
+        self.buffer_size = self.get_parameter('buffer_size').get_parameter_value().integer_value
+        self.timeout_seconds = self.get_parameter('timeout_seconds').get_parameter_value().double_value
+        self.buffer_size = self.get_parameter('num_sensors').get_parameter_value().integer_value
+        self.link = self.get_parameter('link').get_parameter_value().string_value
+        self.num_sensors = self.get_parameter('num_sensors').get_parameter_value().integer_value
+        #self.max_devices = self.get_parameter('max_devices').get_parameter_value().integer_value
+        self.unicast = self.get_parameter('unicast').get_parameter_value().bool_value
+        self.multicast = self.get_parameter('multicast').get_parameter_value().bool_value
 
+        # Device tracking
+        self.device_publishers = {}  # device_id -> publisher
+        self.device_last_seen = {}   # device_id -> last_receive_time
+        self.device_receive_counts = {}  # device_id -> receive_count
+        
+        # UDP socket setup
+        self.socket = self._make_udp_socket(self.udp_port)
+        
+        # Threading
+        self.running = True
+        self.receive_thread = threading.Thread(target=self._receive_loop)
+        self.receive_thread.daemon = True
+        self.receive_thread.start()
+        
+        # Create timer for status updates
+        self.status_timer = self.create_timer(5.0, self._status_update)
+        
+        self.get_logger().info(f"UDP Sensor Publisher started on port {self.udp_port}")
+        #self.get_logger().info(f"Supporting up to {self.max_devices} devices")
+    
+    
     def _get_or_create_publisher(self, sensor_id):
         """Get existing publisher or create new one for device"""
         if sensor_id < self.num_sensors:
@@ -138,7 +141,7 @@ class UDP_PC_Publisher(Node):
             
             return {
                 'sensor_id': sensor_id,
-                'device_id': f'link{self.link}_sensor_{sensor_id}'
+                'device_id': f'link{self.link}_sensor_{sensor_id}',
                 'data': mm
             }
             
@@ -149,12 +152,11 @@ class UDP_PC_Publisher(Node):
             self.get_logger().error(f"Unexpected error parsing data: {e}")
             return None
     
-     def calculate_grid_size(self, dist, angles_X, angles_Y):
+    def calculate_grid_size(self, dist, angles_X, angles_Y):
 
         #return x and y offsets of grid
         x_pos = np.sin(angles_X)*dist
-        y_pos = np.sin(angles_Y)*dist
-
+        y_pos = np.sin(angles_Y)*dist   
         return x_pos,y_pos
     
     def _publish_sensor_data(self, sensor_data, publisher,sensor_id):

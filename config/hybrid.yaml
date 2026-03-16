@@ -27,7 +27,7 @@ sensors:
     num_sensors: 7
     xacro: "../skin/hybrid/link1_hybrid.xacro" # Defined relative to the gentact_ros_tools_hybrid package. Leave empty to not display.
     wireless: false
-    port: ''
+    port: 5004
   link2_skin:
     active: true
     type: "SPAD"

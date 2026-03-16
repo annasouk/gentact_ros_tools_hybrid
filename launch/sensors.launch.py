@@ -101,14 +101,20 @@ def build_sensor_nodes(config, sensor_port_mapping):
 
             if sensor_config.get('type', '') == "SPAD":
                 # Create a sensor publisher node for each active sensor
+                link_len = len("link")
+                skin_str = sensor_key.find("skin")
+                link_id = sensor_key[link_len:skin_str]
                 sensor_node = Node(
                     package='gentact_ros_tools_hybrid',
-                    executable='tof_pub_pc',
+                    executable='pc_publisher',
                     name=f'{sensor_key}_publisher',
                     output='screen',
                     parameters=[{
+                        'udp_port' : sensor_config.get('port'),
+                        'link' : link_id,
+                        'multicast' : True,
                         'num_sensors': sensor_config.get('num_sensors', 8),
-                        'publish_rate': config['sensors'].get('publish_rate', 30.0),
+                        #'publish_rate': config['sensors'].get('publish_rate', 30.0),
                     }]
                 )
                 print(f"SPAD Sensor publisher for {sensor_key} built")
@@ -140,18 +146,6 @@ def build_sensor_nodes(config, sensor_port_mapping):
                 print(f"SCPS Sensor publisher for {sensor_key} built")
             sensor_nodes.append(sensor_node)
     return sensor_nodes
-
-def build_udp_listener_nodes(config):
-    udp_listener_nodes = []
-    for sensor_key, sensor_config in config['sensors'].items():
-        if isinstance(sensor_config, dict) and sensor_config.get('type', '') == "SPAD" and sensor_config.get('active', False):
-            udp_listener_nodes.append(Node(
-                package='udp_tof_listener',
-                executable='udp_grid_listener_array',
-                name='udp_listener',
-                output='screen'
-            ))
-    return udp_listener_nodes
 
 
 def build_prediction_nodes(config, sensor_key, sensor_config):
@@ -368,7 +362,7 @@ def launch_setup(context, *args, **kwargs):
     
     camera_nodes = build_cameras_nodes(config)
     joint_relay_nodes = build_joint_relay_nodes(config)
-    udp_listener_nodes = build_udp_listener_nodes(config)
+    #udp_listener_nodes = build_udp_listener_nodes(config)
     timer_period = 0.0
     timer_period_delay = 0.0
 
@@ -394,9 +388,9 @@ def launch_setup(context, *args, **kwargs):
      #   timer_period += timer_period_delay
 
     # Add sensor nodes with delays
-    #for sensor_node in sensor_nodes:
-    #    launch_actions.append(TimerAction(period=timer_period, actions=[sensor_node]))
-    #    timer_period += timer_period_delay
+    for sensor_node in sensor_nodes:
+        launch_actions.append(TimerAction(period=timer_period, actions=[sensor_node]))
+        timer_period += timer_period_delay
     
     # Add prediction nodes with delays
     #for prediction_node in prediction_nodes:
