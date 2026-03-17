@@ -6,6 +6,11 @@ import socket
 import struct
 import threading
 import time
+import select
+import numpy as np
+
+IMAGE_WIDTH = 8
+NUM_PIXELS = IMAGE_WIDTH*IMAGE_WIDTH
 
 class UDP_PC_Publisher(Node):
     
@@ -40,7 +45,6 @@ class UDP_PC_Publisher(Node):
         self.udp_port = self.get_parameter('udp_port').get_parameter_value().integer_value
         self.buffer_size = self.get_parameter('buffer_size').get_parameter_value().integer_value
         self.timeout_seconds = self.get_parameter('timeout_seconds').get_parameter_value().double_value
-        self.buffer_size = self.get_parameter('num_sensors').get_parameter_value().integer_value
         self.link = self.get_parameter('link').get_parameter_value().string_value
         self.num_sensors = self.get_parameter('num_sensors').get_parameter_value().integer_value
         #self.max_devices = self.get_parameter('max_devices').get_parameter_value().integer_value
@@ -69,7 +73,7 @@ class UDP_PC_Publisher(Node):
         #self.get_logger().info(f"Supporting up to {self.max_devices} devices")
     
     
-    def _get_or_create_publisher(self, sensor_id):
+    def _get_or_create_publisher(self, sensor_id,device_id):
         """Get existing publisher or create new one for device"""
         if sensor_id < self.num_sensors:
             # Create new publisher for this device
@@ -89,29 +93,38 @@ class UDP_PC_Publisher(Node):
         """Main receive loop running in separate thread"""
         while self.running and rclpy.ok():
             try:
+                ready, _, _ = select.select([self.socket], [], [], 0.1)
+                if not ready:
+                    continue  # No data yet, loop back
+
                 # Receive data
                 data, addr = self.socket.recvfrom(self.buffer_size)
-                
+                if int(len(data)) < int(1+NUM_PIXELS*2):
+                    print(f'length of data received is: {len(data)}')
+                    continue
+
                 # Parse sensor data
                 sensor_data = self._parse_sensor_data(data)
                 
                 if sensor_data is not None:
                     device_id = sensor_data['device_id']
+                    sensor_id = sensor_data['sensor_id']
                     
                     # Get or create publisher for this device
-                    publisher = self._get_or_create_publisher(device_id)
+                    publisher = self._get_or_create_publisher(sensor_id, device_id)
                     
                     if publisher is not None:
                         # Publish to ROS2
                         self._publish_sensor_data(sensor_data, publisher)
-                        
+                        print(f'published to {device_id}')
+
                         # Update status
                         self.device_last_seen[device_id] = time.time()
                         self.device_receive_counts[device_id] += 1
                         
                         # Log received data
                         self.get_logger().debug(
-                            f"Received from {addr}: device_id={device_id:08x}, "
+                            f"Received from {addr}: device_id={device_id}, "
                             f"sensors={sensor_data['sensor_values']}, "
                             f"raw_size={len(sensor_data['raw_data'])}"
                         )
@@ -132,14 +145,13 @@ class UDP_PC_Publisher(Node):
 
         try:
             # Expected structure: 
-            if len(data) < 4096 :  # Minimum size (4+4+4)
-                self.get_logger().warn(f"Received data too small: {len(data)} bytes")
-                return None
+            #if len(data) < 4096 :  # Minimum size (4+4+4)
+            #    self.get_logger().warn(f"Received data too small: {len(data)} bytes")
+            #    return None
             
             # Unpack binary data
-            sensor_id = np.frombuffer(data[0], dtype=np.uint16)
-            # Uses only filtered data for now  
-            mm = np.frombuffer(data[1:1 + NUM_PIXELS], dtype=np.uint16) / 1000.0
+            sensor_id = data[0]
+            mm = np.frombuffer(data[1:1 + NUM_PIXELS * 2], dtype=np.uint16) / 1000.0
             
             return {
                 'sensor_id': sensor_id,
