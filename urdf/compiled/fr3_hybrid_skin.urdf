@@ -439,7 +439,7 @@
   </link>
   <joint name="link5_front_base_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0"/>
-    <parent link="fr3_link5"/>
+    <parent link="fr3_link5_front"/>
     <child link="link5_front_skin"/>
   </joint>
   <!-- Instantiate sensors -->
@@ -488,7 +488,7 @@
   </link>
   <joint name="link5_back_base_joint" type="fixed">
     <origin rpy="0 0 0" xyz="0 0 0"/>
-    <parent link="fr3_link5"/>
+    <parent link="fr3_link5_back"/>
     <child link="link5_back_skin"/>
   </joint>
   <!-- Instantiate sensors -->

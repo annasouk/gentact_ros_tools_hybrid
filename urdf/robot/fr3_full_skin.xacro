@@ -213,14 +213,14 @@
   <xacro:property name="link5_front_skin_value" value="$(arg link5_front_skin)" />
   <xacro:if value="${link5_front_skin_value != ''}">
     <xacro:include filename="$(arg link5_front_skin)" />
-    <xacro:link5_front_skin parent="fr3_link5" namespace="link5" />
+    <xacro:link5_front_skin parent="fr3_link5_front" namespace="link5_front" />
   </xacro:if>
 
   <!-- Include the skin for link5 if specified -->
   <xacro:property name="link5_back_skin_value" value="$(arg link5_back_skin)" />
   <xacro:if value="${link5_back_skin_value != ''}">
     <xacro:include filename="$(arg link5_back_skin)" />
-    <xacro:link5_back_skin parent="fr3_link5" namespace="link5" />
+    <xacro:link5_back_skin parent="fr3_link5_back" namespace="link5_back" />
   </xacro:if>
 
   <!-- sub-link defining detailed meshes for collision with environment -->

@@ -102,7 +102,7 @@ def build_sensor_nodes(config, sensor_port_mapping):
             if sensor_config.get('type', '') == "SPAD":
                 # Create a sensor publisher node for each active sensor
                 link_len = len("link")
-                skin_str = sensor_key.find("skin")
+                skin_str = sensor_key.find("_skin")
                 link_id = sensor_key[link_len:skin_str]
                 sensor_node = Node(
                     package='gentact_ros_tools_hybrid',

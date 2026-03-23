@@ -1,6 +1,6 @@
 import rclpy
 from rclpy.node import Node
-from std_msgs.msg import Float64MultiArray, Int32MultiArray
+from std_msgs.msg import Float64MultiArray, Int32MultiArray,Header
 from sensor_msgs.msg import PointCloud2, PointField
 import socket
 import struct
@@ -8,6 +8,7 @@ import threading
 import time
 import select
 import numpy as np
+import sys
 
 IMAGE_WIDTH = 8
 NUM_PIXELS = IMAGE_WIDTH*IMAGE_WIDTH
@@ -75,11 +76,11 @@ class UDP_PC_Publisher(Node):
     
     def _get_or_create_publisher(self, sensor_id,device_id):
         """Get existing publisher or create new one for device"""
-        if sensor_id < self.num_sensors:
+        if device_id not in self.device_publishers:
             # Create new publisher for this device
-            topic_name = f'/hybrid/link_{self.link}_{sensor_id}'
-            publisher = self.create_publisher(Int32MultiArray, topic_name, 1)
-            pc_publisher = self.create_publisher(PointCloud2, topic_name, 1)
+            topic_name = f'link{self.link}_sensor_{sensor_id}'
+            #topic_name = f'link{self.link}_sensor_{sensor_id}'
+            publisher = self.create_publisher(PointCloud2, topic_name, 1)
             device_id = f'link{self.link}_sensor_{sensor_id}'
             self.device_publishers[device_id] = publisher
             self.device_last_seen[device_id] = time.time()
@@ -115,7 +116,7 @@ class UDP_PC_Publisher(Node):
                     
                     if publisher is not None:
                         # Publish to ROS2
-                        self._publish_sensor_data(sensor_data, publisher)
+                        self._publish_sensor_data(sensor_data, publisher, sensor_id)
                         print(f'published to {device_id}')
 
                         # Update status
@@ -125,8 +126,8 @@ class UDP_PC_Publisher(Node):
                         # Log received data
                         self.get_logger().debug(
                             f"Received from {addr}: device_id={device_id}, "
-                            f"sensors={sensor_data['sensor_values']}, "
-                            f"raw_size={len(sensor_data['raw_data'])}"
+                            f"sensors={sensor_data['data']}, "
+                            #f"raw_size={len(sensor_data['raw_data'])}"
                         )
                     
             except socket.timeout:
@@ -177,7 +178,7 @@ class UDP_PC_Publisher(Node):
         """Publish sensor data as ROS2 message"""
         try:
             
-            data_grid_8x8 = np.array(msg.data, dtype=np.uint16).reshape(8, 8)
+            data_grid_8x8 = np.array(sensor_data['data'], dtype=np.uint16).reshape(8, 8)
             # flips the array
             data_grid_8x8 = data_grid_8x8[::-1,:]
 
@@ -210,7 +211,7 @@ class UDP_PC_Publisher(Node):
             
             # Create PointCloud2 msg
             pc_msg = PointCloud2(
-                header=Header(frame_id=f'fr3_{self.link}/{self.link}_sensor_{sensor_id}'),
+                header=Header(frame_id=f'link{self.link}_sensor_{sensor_id}'),
                 height=1,
                 width=sensor_pts.shape[0],
                 is_dense=False,
@@ -222,10 +223,10 @@ class UDP_PC_Publisher(Node):
                 #row_step=16 * sensor_pts.shape[0], uncomment if above doesn't work 
                 data=sensor_pts.tobytes()
             )
-            self.pc_publishers[sensor_id].publish(pc_msg)
+            publisher.publish(pc_msg)
             
             # Publish
-            publisher.publish(msg)
+            #publisher.publish(msg)
             
         except Exception as e:
             self.get_logger().error(f"Error publishing sensor data: {e}")
@@ -244,13 +245,13 @@ class UDP_PC_Publisher(Node):
             
             if time_since_last > self.timeout_seconds:
                 self.get_logger().warn(
-                    f"Device {device_id:08x}: No data for {time_since_last:.1f}s "
+                    f"Device {device_id}: No data for {time_since_last:.1f}s "
                     f"(total packets: {packet_count})"
                 )
             else:
                 active_devices += 1
                 self.get_logger().info(
-                    f"Device {device_id:08x}: {packet_count} packets, "
+                    f"Device {device_id}: {packet_count} packets, "
                     f"last: {time_since_last:.1f}s ago"
                 )
         
