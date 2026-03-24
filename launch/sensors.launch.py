@@ -340,7 +340,7 @@ def launch_setup(context, *args, **kwargs):
     # Get port mapping from serial number scanning
     sensor_port_mapping = map_serial_numbers_to_sensors(config)
     print(f"Completed mapping serial numbers to sensor ports\n\n")
-    sensor_nodes = build_sensor_nodes(config, sensor_port_mapping)
+    #sensor_nodes = build_sensor_nodes(config, sensor_port_mapping)
     
     # Build prediction nodes for each active sensor
     prediction_nodes = []
@@ -389,9 +389,9 @@ def launch_setup(context, *args, **kwargs):
      #   timer_period += timer_period_delay
 
     # Add sensor nodes with delays
-    for sensor_node in sensor_nodes:
-        launch_actions.append(TimerAction(period=timer_period, actions=[sensor_node]))
-        timer_period += timer_period_delay
+    #for sensor_node in sensor_nodes:
+    #    launch_actions.append(TimerAction(period=timer_period, actions=[sensor_node]))
+    #    timer_period += timer_period_delay
     
     # Add prediction nodes with delays
     #for prediction_node in prediction_nodes:
