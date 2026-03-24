@@ -47,6 +47,7 @@ class UDP_PC_Publisher(Node):
         self.buffer_size = self.get_parameter('buffer_size').get_parameter_value().integer_value
         self.timeout_seconds = self.get_parameter('timeout_seconds').get_parameter_value().double_value
         self.link = self.get_parameter('link').get_parameter_value().string_value
+        self.link_num = ''.join(filter(lambda x: x.isdigit(), self.link))
         self.num_sensors = self.get_parameter('num_sensors').get_parameter_value().integer_value
         #self.max_devices = self.get_parameter('max_devices').get_parameter_value().integer_value
         self.unicast = self.get_parameter('unicast').get_parameter_value().bool_value
@@ -78,7 +79,7 @@ class UDP_PC_Publisher(Node):
         """Get existing publisher or create new one for device"""
         if device_id not in self.device_publishers:
             # Create new publisher for this device
-            topic_name = f'link{self.link}_sensor_{sensor_id}'
+            topic_name = f'fr3_link{self.link_num}/link{self.link}_sensor_{sensor_id}'
             #topic_name = f'link{self.link}_sensor_{sensor_id}'
             publisher = self.create_publisher(PointCloud2, topic_name, 1)
             device_id = f'link{self.link}_sensor_{sensor_id}'
@@ -209,9 +210,11 @@ class UDP_PC_Publisher(Node):
             sensor_pts = np.reshape(x_y_z_offset, (64, len(fields))).astype(np.float32)
             itemsize = sensor_pts.itemsize
             
+            
+
             # Create PointCloud2 msg
             pc_msg = PointCloud2(
-                header=Header(frame_id=f'link{self.link}_sensor_{sensor_id}'),
+                header=Header(frame_id=f'fr3_link{self.link_num}/link{self.link}_sensor_{sensor_id}'),
                 height=1,
                 width=sensor_pts.shape[0],
                 is_dense=False,
