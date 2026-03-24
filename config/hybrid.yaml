@@ -1,13 +1,12 @@
 robot:
   arm_id: "fr3"
   joint_relay: true
-  joint_publisher: false
+  joint_publisher: true
   robot_ip: "192.168.0.198" # Only used for joint relay. Ignore if joint relay is false.
   robot_xacro: "urdf/compiled/fr3_hybrid_skin.urdf" # Make sure the skin xacros are included in this file!
   end_effector:
     active: false
     xacro: "../end_effectors/sphere_ee.xacro" # Defined relative to the robot xacro file
-
 
 controller:
   active: false
@@ -17,7 +16,7 @@ controller:
 sensors:
   active: true
   publish_rate: 30.0 # Hz
-  multicast_group: '239.0.0.1'
+  multicast_group: "239.0.0.1"
   multicast: true
 
   # All links defined as in xacro: i.e. '${robot.arm_id}_${link_name}' -> 'fr3_link1'
@@ -61,7 +60,7 @@ sensors:
     num_sensors: 10
     xacro: "../skin/hybrid/link5_hybrid_front.xacro" # Defined relative to the gentact_ros_tools_hybrid package. Leave empty to not display. Defined from robot xacro file.
     wireless: false
-    port: 5007 # testing if two ports on one skin is possible 
+    port: 5007 # testing if two ports on one skin is possible
   link5_back_skin:
     active: true
     type: "SPAD"
@@ -69,7 +68,7 @@ sensors:
     num_sensors: 10
     xacro: "../skin/hybrid/link5_hybrid_back.xacro" # Defined relative to the gentact_ros_tools_hybrid package. Leave empty to not display. Defined from robot xacro file.
     wireless: false
-    port: 5008 # testing if two ports on one skin is possible 
+    port: 5008 # testing if two ports on one skin is possible
   link6_skin:
     active: true
     type: "SPAD"
@@ -78,7 +77,7 @@ sensors:
     xacro: "../skin/hybrid/link6_hybrid.xacro" # Defined relative to the gentact_ros_tools_hybrid package. Leave empty to not display. Defined from robot xacro file.
     wireless: false
     port: 5009
-    multiplier: [1.0,1.0,1.0,1.0,100000.0,1.0]
+    multiplier: [1.0, 1.0, 1.0, 1.0, 100000.0, 1.0]
 
 prediction:
   active: false
@@ -88,7 +87,7 @@ prediction:
     min_dist: 0.05 # Minimum distance to consider for collision avoidance. (m)
   mlp:
     active: false
-    model_path: "~/self-cap-ml/saved_models/mlp_model.pth" # Absolute path to the model file. 
+    model_path: "~/self-cap-ml/saved_models/mlp_model.pth" # Absolute path to the model file.
   mamba:
     active: false
     model_path: "~/self-cap-ml/saved_models/mamba_all.pth" # Absolute path to the model file.
@@ -109,8 +108,7 @@ tracker:
   baseline_kd: 0.000001
   masking_threshold: 100.0 # Threshold for masking baseline updates
 
-
-cameras: 
+cameras:
   active: false
   launch_file: "cameras.launch.py" # Launch file to launch the cameras.
 
@@ -124,7 +122,6 @@ calibration: # If a single skin needs to be calibrated, set active to true.
   port: "/dev/ttyACM0" # Put publisher IP for wifi, or serial port for usb (e.g. /dev/ttyACM0).
   link_name: "calibration_sensor" # Name of the link to publish the sensor data to.
   publish_rate: 30.0 # Hz
-  transform: [0, 0, 0, 0, 0, 0, 'map', 'calibration_base'] # Transform to apply to the skin.
+  transform: [0, 0, 0, 0, 0, 0, "map", "calibration_base"] # Transform to apply to the skin.
   training_data_path: "~/self-cap-ml/data/training_data.csv" # Absolute path to the training data file.
   distance_file_path: "~/self-cap/data/data.csv" # Absolute path to the distance file.
-  
