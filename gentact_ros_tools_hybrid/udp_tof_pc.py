@@ -89,6 +89,15 @@ class UDP_PC_Publisher(Node):
         self.get_logger().info(f"UDP Sensor Publisher started on port {self.udp_port}")
         # self.get_logger().info(f"Supporting up to {self.max_devices} devices")
 
+        # Precompute angle meshgrid (VL53L5CX 45° FoV, 8x8)
+        fov_angle = 45.0 * (np.pi / 180.0)
+        mid_fov_angle = fov_angle / 2.0
+        angles_x = np.linspace(-mid_fov_angle, mid_fov_angle, 8)  # cols → sensor X
+        angles_y = np.linspace(
+            mid_fov_angle, -mid_fov_angle, 8
+        )  # rows → sensor Y (row 0 = top)
+        self.angles_X, self.angles_Y = np.meshgrid(angles_x, angles_y)
+
     def _get_or_create_publisher(self, sensor_id, device_id):
         """Get existing publisher or create new one for device"""
         if device_id not in self.device_publishers:
@@ -194,16 +203,18 @@ class UDP_PC_Publisher(Node):
             data_grid_8x8 = sensor_data["data"].reshape(8, 8)
             print(data_grid_8x8)
             # flips the array
-            data_grid_8x8 = data_grid_8x8[::-1, :]
+            # data_grid_8x8 = data_grid_8x8[::-1, :]
 
             # Detection angle
             # view page 4 of https://www.st.com/resource/en/datasheet/vl53l5cx.pdf
+            """
             fov_angle = 45.0 * (np.pi / 180.0)
             # angle is divided by 2 because solving sidelen of isoceles triangle
             mid_fov_angle = fov_angle / 2.0
             angles_x = np.array([np.linspace(-mid_fov_angle, mid_fov_angle, 8)])
             angles_y = np.array([np.linspace(mid_fov_angle, -mid_fov_angle, 8)])
             angles_X, angles_Y = np.meshgrid(angles_x, angles_y)
+            """
 
             # Convert to meters
             z_offset = data_grid_8x8.astype(np.float64)
