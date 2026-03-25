@@ -190,11 +190,11 @@ class UDP_PC_Publisher(Node):
             self.get_logger().error(f"Unexpected error parsing data: {e}")
             return None
 
-    def calculate_grid_size(self, dist, angles_X, angles_Y):
+    def calculate_grid_size(self, dist):
 
         # return x and y offsets of grid
-        x_pos = np.sin(angles_X) * dist
-        y_pos = np.sin(angles_Y) * dist
+        x_pos = np.sin(self.angles_X) * dist
+        y_pos = np.sin(self.angles_Y) * dist
         return x_pos, y_pos
 
     def _publish_sensor_data(self, sensor_data, publisher, sensor_id):
@@ -202,23 +202,18 @@ class UDP_PC_Publisher(Node):
         try:
             data_grid_8x8 = sensor_data["data"].reshape(8, 8)
             print(data_grid_8x8)
-            # flips the array
+            # flips the array -- dont need this anymore
             # data_grid_8x8 = data_grid_8x8[::-1, :]
+            # flip horizontally
+            data_grid_8x8 = data_grid_8x8[:, ::-1]
 
             # Detection angle
             # view page 4 of https://www.st.com/resource/en/datasheet/vl53l5cx.pdf
-            """
-            fov_angle = 45.0 * (np.pi / 180.0)
-            # angle is divided by 2 because solving sidelen of isoceles triangle
-            mid_fov_angle = fov_angle / 2.0
-            angles_x = np.array([np.linspace(-mid_fov_angle, mid_fov_angle, 8)])
-            angles_y = np.array([np.linspace(mid_fov_angle, -mid_fov_angle, 8)])
-            angles_X, angles_Y = np.meshgrid(angles_x, angles_y)
-            """
 
             # Convert to meters
             z_offset = data_grid_8x8.astype(np.float64)
-            x_offset, y_offset = self.calculate_grid_size(z_offset, angles_X, angles_Y)
+
+            x_offset, y_offset = self.calculate_grid_size(z_offset)
 
             fields = [
                 PointField(name="x", offset=0, datatype=PointField.FLOAT32, count=1),
