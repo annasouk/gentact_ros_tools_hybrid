@@ -201,7 +201,7 @@ class UDP_PC_Publisher(Node):
         """Publish sensor data as ROS2 message"""
         try:
             data_grid_8x8 = sensor_data["data"].reshape(8, 8)
-            print(data_grid_8x8)
+            # print(data_grid_8x8)
             # flips the array -- dont need this anymore
             # data_grid_8x8 = data_grid_8x8[::-1, :]
             # flip horizontally
