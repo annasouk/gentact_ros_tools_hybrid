@@ -77,6 +77,7 @@ setup(
             "joint_states_monitor = gentact_ros_tools_hybrid.joint_states_monitor:main",
             "test_talker = gentact_ros_tools_hybrid.test_talker:main",
             "combine_pc = gentact_ros_tools_hybrid.combine_pc:main",
+            "unitree_lowstate_bridge = gentact_ros_tools_hybrid.unitree_lowstate_bridge:main",
         ],
     },
 )

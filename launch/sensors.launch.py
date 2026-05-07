@@ -130,6 +130,35 @@ def build_robot(config, use_sim_time, robot_description):
     return robot_nodes
 
 
+def build_unitree_bridge_nodes(config):
+    """Bridge Unitree DDS LowState -> sensor_msgs/JointState. Robot-agnostic;
+    only fires when robot.unitree_bridge.active is true."""
+    nodes = []
+    bridge_cfg = config["robot"].get("unitree_bridge", {})
+    if not bridge_cfg.get("active", False):
+        return nodes
+
+    nodes.append(
+        Node(
+            package="gentact_ros_tools_hybrid",  # wherever you put the bridge executable
+            executable="unitree_lowstate_bridge",
+            name=f"{config['robot']['arm_id']}_unitree_lowstate_bridge",
+            output="screen",
+            parameters=[
+                {
+                    "lowstate_topic": bridge_cfg.get("lowstate_topic", "/lowstate"),
+                    "joint_states_topic": bridge_cfg.get(
+                        "joint_states_topic", "/joint_states"
+                    ),
+                    "num_joints": bridge_cfg.get("num_joints", 27),
+                    "joint_names": bridge_cfg.get("joint_names", []),
+                }
+            ],
+        )
+    )
+    return nodes
+
+
 def build_sensor_nodes(config, sensor_port_mapping):
     """Build sensor publisher nodes based on active sensors in config"""
     sensor_nodes = []
@@ -285,6 +314,19 @@ def build_tracker_nodes(config, sensor_key, sensor_config):
 
 def build_joint_relay_nodes(config):
     joint_relay_nodes = []
+
+    if config["robot"]["arm_id"] == "h1_2":
+        # apply base tf
+        joint_relay_nodes.append(
+            Node(
+                package="tf2_ros",
+                executable="static_transform_publisher",
+                name="pelvis_to_base",
+                arguments=["0", "0", "1.0", "0", "0", "0", "base", "pelvis"],
+                # x y z roll pitch yaw parent child  — 1.0m up so feet touch ground
+            )
+        )
+
     if config["robot"]["franky_joint_relay"]:
         joint_relay_nodes.append(
             Node(  # Controls the franka to mimic /joint_states_{arm_id}
@@ -424,9 +466,21 @@ def self_detection_node(robot_description):
 
 
 def launch_setup(context, *args, **kwargs):
+
     # Get the config file name from launch configuration
     config_file_name = LaunchConfiguration("config").perform(context)
     config = load_config(config_file_name, context)
+
+    # Guard against multiple /joint_states sources
+    sources = [
+        config["robot"].get("joint_relay", False),
+        config["robot"].get("franky_joint_relay", False),
+        config["robot"].get("unitree_bridge", {}).get("active", False),
+    ]
+    if sum(bool(s) for s in sources) > 1:
+        raise RuntimeError(
+            "Multiple /joint_states sources enabled — pick one in the config."
+        )
 
     use_sim_time = LaunchConfiguration("use_sim_time")
 
@@ -434,6 +488,9 @@ def launch_setup(context, *args, **kwargs):
     robot_description = build_robot_description(config)
 
     robot_nodes = build_robot(config, use_sim_time, robot_description)
+
+    unitree_bridge_nodes = build_unitree_bridge_nodes(config)
+
     if config["robot"]["self_detection"]:
         robot_nodes.append(self_detection_node(robot_description))
     controller_nodes = build_controller_nodes(config)
@@ -511,6 +568,10 @@ def launch_setup(context, *args, **kwargs):
     # for prediction_node in prediction_nodes:
     #    launch_actions.append(TimerAction(period=timer_period, actions=[prediction_node]))
     #    timer_period += timer_period_delay
+
+    for unitree_node in unitree_bridge_nodes:
+        launch_actions.append(TimerAction(period=timer_period, actions=[unitree_node]))
+        timer_period += timer_period_delay
 
     # Add joint relay nodes with delays
     for joint_relay_node in joint_relay_nodes:
