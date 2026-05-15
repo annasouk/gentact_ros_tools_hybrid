@@ -532,76 +532,68 @@
     <child link="left_elbow_skin"/>
   </joint>
   <joint name="left_elbow_sensor_0_joint" type="fixed">
-    <origin rpy="1.6108835935592651 3.0750507695742613e-10 -0.003349356586113572" xyz="-0.0054705264046788216 -0.01703549548983574 -0.02506975084543228"/>
-    <axis xyz="-0.0033466597087681293 -0.9991910457611084 -0.04007663577795029"/>
+    <origin rpy="1.643 0.053 -0.634" xyz="-0.045 -0.011 -0.005"/>
+    <axis xyz="1.643 0.053 -0.634"/>
     <parent link="left_elbow_skin"/>
     <child link="left_elbow_sensor_0"/>
   </joint>
   <link name="left_elbow_sensor_0">
   </link>
   <joint name="left_elbow_sensor_1_joint" type="fixed">
-    <origin rpy="1.4375799894332886 -2.939074983387968e-09 0.032789308577775955" xyz="0.09776215255260468 -0.009773069061338902 -0.003952523693442345"/>
-    <axis xyz="0.03249296545982361 -0.9906070828437805 0.1328226923942566"/>
+    <origin rpy="1.078 -0.020 -0.037" xyz="-0.001 -0.013 0.042"/>
+    <axis xyz="1.078 -0.02 -0.037"/>
     <parent link="left_elbow_skin"/>
     <child link="left_elbow_sensor_1"/>
   </joint>
   <link name="left_elbow_sensor_1">
   </link>
   <joint name="left_elbow_sensor_2_joint" type="fixed">
-    <origin rpy="1.4639254808425903 -1.415918404745753e-08 0.13112856447696686" xyz="0.02981957234442234 -0.015662170946598053 0.0170421302318573"/>
-    <axis xyz="0.13000711798667908 -0.9857586622238159 0.10666757822036743"/>
+    <origin rpy="2.198 -0.022 0.031" xyz="0.002 -0.012 -0.044"/>
+    <axis xyz="0.944 -3.13 0.055"/>
     <parent link="left_elbow_skin"/>
     <child link="left_elbow_sensor_2"/>
   </joint>
   <link name="left_elbow_sensor_2">
   </link>
   <joint name="left_elbow_sensor_3_joint" type="fixed">
-    <origin rpy="2.034855842590332 1.6719945428178562e-09 0.1387859433889389" xyz="0.03183375298976898 -0.012470245361328125 -0.038558200001716614"/>
-    <axis xyz="0.12371029704809189 -0.8856444358825684 -0.4475819766521454"/>
+    <origin rpy="1.572 -0.000 0.017" xyz="0.002 -0.017 -0.003"/>
+    <axis xyz="1.572 -0.0 0.017"/>
     <parent link="left_elbow_skin"/>
     <child link="left_elbow_sensor_3"/>
   </joint>
   <link name="left_elbow_sensor_3">
   </link>
   <joint name="left_elbow_sensor_4_joint" type="fixed">
-    <origin rpy="0.5687653422355652 -1.8162769066520923e-08 0.12151739746332169" xyz="0.09520145505666733 0.008756054565310478 0.02564341574907303"/>
-    <axis xyz="0.06528738886117935 -0.5346206426620483 0.8425664901733398"/>
+    <origin rpy="1.570 0.000 0.144" xyz="0.048 -0.014 -0.005"/>
+    <axis xyz="1.57 0.0 0.144"/>
     <parent link="left_elbow_skin"/>
     <child link="left_elbow_sensor_4"/>
   </joint>
   <link name="left_elbow_sensor_4">
   </link>
   <joint name="left_elbow_sensor_5_joint" type="fixed">
-    <origin rpy="1.5707944631576538 2.0792034760575007e-10 0.004111796617507935" xyz="-0.006869952194392681 -0.017091382294893265 0.005429353564977646"/>
-    <axis xyz="0.004111784510314465 -0.9999915361404419 2.02366391022224e-06"/>
+    <origin rpy="1.542 0.000 0.017" xyz="0.095 -0.010 -0.008"/>
+    <axis xyz="1.542 0.0 0.017"/>
     <parent link="left_elbow_skin"/>
     <child link="left_elbow_sensor_5"/>
   </joint>
   <link name="left_elbow_sensor_5">
   </link>
   <joint name="left_elbow_sensor_6_joint" type="fixed">
-    <origin rpy="0.10568315535783768 -2.4437664336574016e-08 3.049027919769287" xyz="0.08788560330867767 0.03748124837875366 0.03188776969909668"/>
-    <axis xyz="0.00975038856267929 0.10503476858139038 0.9944207668304443"/>
+    <origin rpy="0.179 0.036 0.007" xyz="0.089 0.021 0.031"/>
+    <axis xyz="0.179 0.036 0.007"/>
     <parent link="left_elbow_skin"/>
     <child link="left_elbow_sensor_6"/>
   </joint>
   <link name="left_elbow_sensor_6">
   </link>
   <joint name="left_elbow_sensor_7_joint" type="fixed">
-    <origin rpy="2.8729567527770996 -1.6629815746682652e-08 0.188669815659523" xyz="0.08021856844425201 0.01752631552517414 -0.05247209593653679"/>
-    <axis xyz="0.049779538065195084 -0.26070669293403625 -0.9641338586807251"/>
+    <origin rpy="3.032 -0.022 0.002" xyz="0.089 0.026 -0.054"/>
+    <axis xyz="3.032 -0.022 0.002"/>
     <parent link="left_elbow_skin"/>
     <child link="left_elbow_sensor_7"/>
   </joint>
   <link name="left_elbow_sensor_7">
-  </link>
-  <joint name="left_elbow_sensor_8_joint" type="fixed">
-    <origin rpy="2.093989372253418 -2.5215447507775934e-09 0.17718012630939484" xyz="0.06785736232995987 -0.006429128348827362 -0.03632089123129845"/>
-    <axis xyz="0.15267664194107056 -0.8526670932769775 -0.4996485412120819"/>
-    <parent link="left_elbow_skin"/>
-    <child link="left_elbow_sensor_8"/>
-  </joint>
-  <link name="left_elbow_sensor_8">
   </link>
   <link name="left_wrist_roll_link">
     <inertial>
@@ -853,52 +845,60 @@
     <child link="right_shoulder_yaw_skin"/>
   </joint>
   <joint name="right_shoulder_yaw_sensor_0_joint" type="fixed">
-    <origin rpy="1.8597503900527954 1.1286831025358879e-08 1.4440847635269165" xyz="0.04118751734495163 -0.004814512562006712 -0.08737954497337341"/>
-    <axis xyz="0.9508576989173889 -0.12113388627767563 -0.28494971990585327"/>
+    <origin rpy="1.586 0.067 -1.345" xyz="-0.052 -0.011 -0.040"/>
+    <axis xyz="-1.586 -0.062 1.796"/>
     <parent link="right_shoulder_yaw_skin"/>
     <child link="right_shoulder_yaw_sensor_0"/>
   </joint>
   <link name="right_shoulder_yaw_sensor_0">
   </link>
   <joint name="right_shoulder_yaw_sensor_1_joint" type="fixed">
-    <origin rpy="1.646294355392456 1.8119585831755103e-09 -0.7687416672706604" xyz="-0.035796575248241425 -0.03355425223708153 -0.04064032435417175"/>
-    <axis xyz="-0.6932508945465088 -0.7167385220527649 -0.07542620599269867"/>
+    <origin rpy="1.567 -0.014 -1.288" xyz="-0.051 -0.012 -0.092"/>
+    <axis xyz="1.641 1.629 -1.218"/>
     <parent link="right_shoulder_yaw_skin"/>
     <child link="right_shoulder_yaw_sensor_1"/>
   </joint>
   <link name="right_shoulder_yaw_sensor_1">
   </link>
   <joint name="right_shoulder_yaw_sensor_2_joint" type="fixed">
-    <origin rpy="1.8499118089675903 -2.4386073160798105e-09 0.04182104021310806" xyz="0.0068807341158390045 -0.038329385221004486 -0.07258914411067963"/>
-    <axis xyz="0.04019082337617874 -0.9604589939117432 -0.2755054235458374"/>
+    <origin rpy="1.751 0.082 -0.421" xyz="-0.028 -0.039 -0.069"/>
+    <axis xyz="-0.259 -1.757 1.398"/>
     <parent link="right_shoulder_yaw_skin"/>
     <child link="right_shoulder_yaw_sensor_2"/>
   </joint>
   <link name="right_shoulder_yaw_sensor_2">
   </link>
   <joint name="right_shoulder_yaw_sensor_3_joint" type="fixed">
-    <origin rpy="1.571201205253601 3.790614400145387e-08 -1.4650746583938599" xyz="-0.04953809827566147 -0.003564621554687619 -0.0796278566122055"/>
-    <axis xyz="-0.9944165349006653 -0.10552489757537842 -0.0004047837865073234"/>
+    <origin rpy="1.751 -0.015 0.084" xyz="0.006 -0.049 -0.043"/>
+    <axis xyz="1.39 -3.116 0.091"/>
     <parent link="right_shoulder_yaw_skin"/>
     <child link="right_shoulder_yaw_sensor_3"/>
   </joint>
   <link name="right_shoulder_yaw_sensor_3">
   </link>
   <joint name="right_shoulder_yaw_sensor_4_joint" type="fixed">
-    <origin rpy="1.5546531677246094 -2.4349319005523284e-08 -3.0059409141540527" xyz="-0.00878828577697277 0.04951019585132599 -0.0318453386425972"/>
-    <axis xyz="-0.13521844148635864 0.9906842708587646 0.01614234782755375"/>
+    <origin rpy="1.731 0.000 -0.001" xyz="0.003 -0.033 -0.106"/>
+    <axis xyz="1.41 -3.101 0.006"/>
     <parent link="right_shoulder_yaw_skin"/>
     <child link="right_shoulder_yaw_sensor_4"/>
   </joint>
   <link name="right_shoulder_yaw_sensor_4">
   </link>
   <joint name="right_shoulder_yaw_sensor_5_joint" type="fixed">
-    <origin rpy="1.5915374755859375 1.0039254760840777e-08 -0.16846124827861786" xyz="-0.0280979685485363 -0.027626603841781616 -0.11977264285087585"/>
-    <axis xyz="-0.16762951016426086 -0.9856319427490234 -0.020739588886499405"/>
+    <origin rpy="1.818 -0.171 0.594" xyz="0.032 -0.034 -0.072"/>
+    <axis xyz="1.814 0.018 0.641"/>
     <parent link="right_shoulder_yaw_skin"/>
     <child link="right_shoulder_yaw_sensor_5"/>
   </joint>
   <link name="right_shoulder_yaw_sensor_5">
+  </link>
+  <joint name="right_shoulder_yaw_sensor_6_joint" type="fixed">
+    <origin rpy="1.584 -0.029 1.136" xyz="0.049 -0.021 -0.038"/>
+    <axis xyz="1.584 -0.029 1.136"/>
+    <parent link="right_shoulder_yaw_skin"/>
+    <child link="right_shoulder_yaw_sensor_6"/>
+  </joint>
+  <link name="right_shoulder_yaw_sensor_6">
   </link>
   <link name="right_elbow_link">
     <inertial>
