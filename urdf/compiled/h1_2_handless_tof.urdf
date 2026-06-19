@@ -4,9 +4,8 @@
 <!-- |    EDITING THIS FILE BY HAND IS NOT RECOMMENDED                                 | -->
 <!-- =================================================================================== -->
 <robot name="h1_2">
-  <!-- xacro for ToF Skins made by Nick J. -->
   <mujoco>
-    <compiler discardvisual="false" meshdir="package://gentact_ros_tools_hybrid/meshes/h1_2"/>
+    <compiler discardvisual="false" meshdir="package://gentact_ros_tools_hybrid/meshes/h1_2/"/>
   </mujoco>
   <!-- [CAUTION] uncomment when convert to mujoco -->
   <!-- <link name="world"></link>
@@ -23,16 +22,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/pelvis.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//pelvis.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/pelvis.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//pelvis.STL"/>
       </geometry>
     </collision>
   </link>
@@ -46,9 +45,9 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_hip_yaw_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_hip_yaw_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
@@ -69,16 +68,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_hip_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_hip_pitch_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_hip_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_hip_pitch_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -98,16 +97,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_hip_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_hip_roll_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_hip_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_hip_roll_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -127,9 +126,9 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_knee_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_knee_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
@@ -147,6 +146,84 @@
     <axis xyz="0 1 0"/>
     <limit effort="300" lower="-0.12" upper="2.19" velocity="14"/>
   </joint>
+  <!-- [m] -->
+  <link name="left_hip_roll_skin">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/skin/tof/left_hip_roll_skin.stl" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="left_hip_roll_base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="left_hip_roll_link"/>
+    <child link="left_hip_roll_skin"/>
+  </joint>
+  <joint name="left_hip_roll_sensor_0_joint" type="fixed">
+    <origin rpy="-1.610 -0.003 -0.072" xyz="0.006 0.079 -0.118"/>
+    <axis xyz="0.072 0.996634 -0.039193"/>
+    <parent link="left_hip_roll_skin"/>
+    <child link="left_hip_roll_sensor_0"/>
+  </joint>
+  <link name="left_hip_roll_sensor_0">
+  </link>
+  <joint name="left_hip_roll_sensor_1_joint" type="fixed">
+    <origin rpy="-1.597 -0.004 -0.141" xyz="0.036 0.078 -0.041"/>
+    <axis xyz="0.140589 0.989721 -0.0262"/>
+    <parent link="left_hip_roll_skin"/>
+    <child link="left_hip_roll_sensor_1"/>
+  </joint>
+  <link name="left_hip_roll_sensor_1">
+  </link>
+  <joint name="left_hip_roll_sensor_2_joint" type="fixed">
+    <origin rpy="-1.597 0.001 0.046" xyz="-0.007 0.083 -0.000"/>
+    <axis xyz="-0.045994 0.998598 -0.026201"/>
+    <parent link="left_hip_roll_skin"/>
+    <child link="left_hip_roll_sensor_2"/>
+  </joint>
+  <link name="left_hip_roll_sensor_2">
+  </link>
+  <joint name="left_hip_roll_sensor_3_joint" type="fixed">
+    <origin rpy="-1.699 -1.122 -1.428" xyz="0.068 0.017 -0.061"/>
+    <axis xyz="0.998092 0.027125 -0.055473"/>
+    <parent link="left_hip_roll_skin"/>
+    <child link="left_hip_roll_sensor_3"/>
+  </joint>
+  <link name="left_hip_roll_sensor_3">
+  </link>
+  <joint name="left_hip_roll_sensor_4_joint" type="fixed">
+    <origin rpy="-1.659 -0.882 -1.457" xyz="0.071 0.043 0.003"/>
+    <axis xyz="0.997392 0.045543 -0.05599"/>
+    <parent link="left_hip_roll_skin"/>
+    <child link="left_hip_roll_sensor_4"/>
+  </joint>
+  <link name="left_hip_roll_sensor_4">
+  </link>
+  <joint name="left_hip_roll_sensor_5_joint" type="fixed">
+    <origin rpy="-1.699 -1.122 -1.428" xyz="0.064 0.043 -0.122"/>
+    <axis xyz="0.998092 0.027125 -0.055473"/>
+    <parent link="left_hip_roll_skin"/>
+    <child link="left_hip_roll_sensor_5"/>
+  </joint>
+  <link name="left_hip_roll_sensor_5">
+  </link>
+  <joint name="left_hip_roll_sensor_6_joint" type="fixed">
+    <origin rpy="-2.077 1.370 1.056" xyz="-0.080 0.025 -0.009"/>
+    <axis xyz="-0.995167 0.017072 -0.096705"/>
+    <parent link="left_hip_roll_skin"/>
+    <child link="left_hip_roll_sensor_6"/>
+  </joint>
+  <link name="left_hip_roll_sensor_6">
+  </link>
+  <joint name="left_hip_roll_sensor_7_joint" type="fixed">
+    <origin rpy="-2.571 1.371 0.562" xyz="-0.063 0.027 -0.089"/>
+    <axis xyz="-0.985797 0.017514 -0.167028"/>
+    <parent link="left_hip_roll_skin"/>
+    <child link="left_hip_roll_sensor_7"/>
+  </joint>
+  <link name="left_hip_roll_sensor_7">
+  </link>
   <link name="left_ankle_pitch_link">
     <inertial>
       <origin rpy="0 0 0" xyz="-0.000294 0 -0.010794"/>
@@ -156,9 +233,9 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_ankle_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_ankle_pitch_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
@@ -179,16 +256,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_ankle_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_ankle_roll_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_ankle_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_ankle_roll_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -199,6 +276,60 @@
     <axis xyz="1 0 0"/>
     <limit effort="40" lower="-0.261799" upper="0.261799" velocity="9"/>
   </joint>
+  <!-- [m] -->
+  <link name="left_knee_skin">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/skin/tof/left_knee_link_skin.stl" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="left_knee_base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="left_knee_link"/>
+    <child link="left_knee_skin"/>
+  </joint>
+  <joint name="left_knee_sensor_0_joint" type="fixed">
+    <origin rpy="3.142 -1.556 0.000" xyz="0.061 -0.034 0.026"/>
+    <axis xyz="0.015314 0.000908 0.999882"/>
+    <parent link="left_knee_skin"/>
+    <child link="left_knee_sensor_0"/>
+  </joint>
+  <link name="left_knee_sensor_0">
+  </link>
+  <joint name="left_knee_sensor_1_joint" type="fixed">
+    <origin rpy="3.142 -1.537 0.000" xyz="0.060 0.003 -0.025"/>
+    <axis xyz="-0.034685 -0.00091 -0.999398"/>
+    <parent link="left_knee_skin"/>
+    <child link="left_knee_sensor_1"/>
+  </joint>
+  <link name="left_knee_sensor_1">
+  </link>
+  <joint name="left_knee_sensor_2_joint" type="fixed">
+    <origin rpy="3.142 -1.537 0.000" xyz="0.058 0.005 -0.073"/>
+    <axis xyz="0.996841 0.003415 -0.079347"/>
+    <parent link="left_knee_skin"/>
+    <child link="left_knee_sensor_2"/>
+  </joint>
+  <link name="left_knee_sensor_2">
+  </link>
+  <joint name="left_knee_sensor_3_joint" type="fixed">
+    <origin rpy="-1.571 0.000 0.000" xyz="0.013 0.055 0.012"/>
+    <axis xyz="-3.3e-05 1.0 -0.000906"/>
+    <parent link="left_knee_skin"/>
+    <child link="left_knee_sensor_3"/>
+  </joint>
+  <link name="left_knee_sensor_3">
+  </link>
+  <joint name="left_knee_sensor_4_joint" type="fixed">
+    <origin rpy="-1.544 -0.000 0.007" xyz="0.010 0.055 -0.063"/>
+    <axis xyz="-0.005593 0.994921 -0.100504"/>
+    <parent link="left_knee_skin"/>
+    <child link="left_knee_sensor_4"/>
+  </joint>
+  <link name="left_knee_sensor_4">
+  </link>
   <!-- R Leg -->
   <link name="right_hip_yaw_link">
     <inertial>
@@ -209,9 +340,9 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_hip_yaw_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_hip_yaw_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
@@ -232,16 +363,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_hip_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_hip_pitch_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_hip_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_hip_pitch_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -261,16 +392,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_hip_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_hip_roll_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_hip_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_hip_roll_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -281,6 +412,84 @@
     <axis xyz="1 0 0"/>
     <limit effort="200" lower="-3.14" upper="0.43" velocity="23"/>
   </joint>
+  <!-- [m] -->
+  <link name="right_hip_roll_skin">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/skin/tof/right_hip_roll_skin.stl" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="right_hip_roll_base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="right_hip_roll_link"/>
+    <child link="right_hip_roll_skin"/>
+  </joint>
+  <joint name="right_hip_roll_sensor_0_joint" type="fixed">
+    <origin rpy="1.610 -0.003 0.072" xyz="0.006 -0.079 -0.118"/>
+    <axis xyz="-0.042383 -0.997948 -0.047987"/>
+    <parent link="right_hip_roll_skin"/>
+    <child link="right_hip_roll_sensor_0"/>
+  </joint>
+  <link name="right_hip_roll_sensor_0">
+  </link>
+  <joint name="right_hip_roll_sensor_1_joint" type="fixed">
+    <origin rpy="1.597 -0.004 0.141" xyz="0.036 -0.078 -0.041"/>
+    <axis xyz="0.141961 -0.989671 -0.01994"/>
+    <parent link="right_hip_roll_skin"/>
+    <child link="right_hip_roll_sensor_1"/>
+  </joint>
+  <link name="right_hip_roll_sensor_1">
+  </link>
+  <joint name="right_hip_roll_sensor_2_joint" type="fixed">
+    <origin rpy="1.597 0.001 -0.046" xyz="-0.007 -0.083 0.000"/>
+    <axis xyz="-0.998868 0.044535 -0.016738"/>
+    <parent link="right_hip_roll_skin"/>
+    <child link="right_hip_roll_sensor_2"/>
+  </joint>
+  <link name="right_hip_roll_sensor_2">
+  </link>
+  <joint name="right_hip_roll_sensor_3_joint" type="fixed">
+    <origin rpy="1.699 -1.122 1.428" xyz="0.068 -0.017 -0.061"/>
+    <axis xyz="0.999652 -0.026273 -0.002366"/>
+    <parent link="right_hip_roll_skin"/>
+    <child link="right_hip_roll_sensor_3"/>
+  </joint>
+  <link name="right_hip_roll_sensor_3">
+  </link>
+  <joint name="right_hip_roll_sensor_4_joint" type="fixed">
+    <origin rpy="1.659 -0.882 1.457" xyz="0.071 -0.043 0.003"/>
+    <axis xyz="0.998938 -0.045993 -0.002585"/>
+    <parent link="right_hip_roll_skin"/>
+    <child link="right_hip_roll_sensor_4"/>
+  </joint>
+  <link name="right_hip_roll_sensor_4">
+  </link>
+  <joint name="right_hip_roll_sensor_5_joint" type="fixed">
+    <origin rpy="1.699 -1.122 1.428" xyz="0.064 -0.043 -0.122"/>
+    <axis xyz="0.999652 -0.026273 -0.002366"/>
+    <parent link="right_hip_roll_skin"/>
+    <child link="right_hip_roll_sensor_5"/>
+  </joint>
+  <link name="right_hip_roll_sensor_5">
+  </link>
+  <joint name="right_hip_roll_sensor_6_joint" type="fixed">
+    <origin rpy="2.077 1.370 -1.056" xyz="-0.080 -0.025 -0.009"/>
+    <axis xyz="-0.995585 -0.018047 -0.092116"/>
+    <parent link="right_hip_roll_skin"/>
+    <child link="right_hip_roll_sensor_6"/>
+  </joint>
+  <link name="right_hip_roll_sensor_6">
+  </link>
+  <joint name="right_hip_roll_sensor_7_joint" type="fixed">
+    <origin rpy="2.571 1.371 -0.562" xyz="-0.063 -0.027 -0.089"/>
+    <axis xyz="-0.951851 -0.016972 -0.30609"/>
+    <parent link="right_hip_roll_skin"/>
+    <child link="right_hip_roll_sensor_7"/>
+  </joint>
+  <link name="right_hip_roll_sensor_7">
+  </link>
   <link name="right_knee_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0.000179 -0.000121 -0.168936"/>
@@ -290,9 +499,9 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_knee_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_knee_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
@@ -310,6 +519,60 @@
     <axis xyz="0 1 0"/>
     <limit effort="300" lower="-0.12" upper="2.19" velocity="14"/>
   </joint>
+  <!-- [m] -->
+  <link name="right_knee_skin">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/skin/tof/right_knee_link_skin.stl" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="right_knee_base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="right_knee_link"/>
+    <child link="right_knee_skin"/>
+  </joint>
+  <joint name="right_knee_sensor_0_joint" type="fixed">
+    <origin rpy="1.7383 0.0000 1.6544" xyz="0.057 0.034 -0.132"/>
+    <axis xyz="0.982561 0.082325 -0.166725"/>
+    <parent link="right_knee_skin"/>
+    <child link="right_knee_sensor_0"/>
+  </joint>
+  <link name="right_knee_sensor_0">
+  </link>
+  <joint name="right_knee_sensor_1_joint" type="fixed">
+    <origin rpy="1.6613 0.0000 1.5710" xyz="0.057 -0.003 -0.184"/>
+    <axis xyz="0.995909 0.000227 -0.090357"/>
+    <parent link="right_knee_skin"/>
+    <child link="right_knee_sensor_1"/>
+  </joint>
+  <link name="right_knee_sensor_1">
+  </link>
+  <joint name="right_knee_sensor_2_joint" type="fixed">
+    <origin rpy="1.6613 0.0000 1.5710" xyz="0.056 -0.005 -0.231"/>
+    <axis xyz="0.995909 0.000227 -0.090357"/>
+    <parent link="right_knee_skin"/>
+    <child link="right_knee_sensor_2"/>
+  </joint>
+  <link name="right_knee_sensor_2">
+  </link>
+  <joint name="right_knee_sensor_3_joint" type="fixed">
+    <origin rpy="1.5699 0.0000 0.0000" xyz="0.010 -0.055 -0.146"/>
+    <axis xyz="3.3e-05 -1.0 0.000906"/>
+    <parent link="right_knee_skin"/>
+    <child link="right_knee_sensor_3"/>
+  </joint>
+  <link name="right_knee_sensor_3">
+  </link>
+  <joint name="right_knee_sensor_4_joint" type="fixed">
+    <origin rpy="1.6697 0.0000 -0.0056" xyz="0.007 -0.055 -0.221"/>
+    <axis xyz="-0.005527 -0.995102 -0.098699"/>
+    <parent link="right_knee_skin"/>
+    <child link="right_knee_sensor_4"/>
+  </joint>
+  <link name="right_knee_sensor_4">
+  </link>
   <link name="right_ankle_pitch_link">
     <inertial>
       <origin rpy="0 0 0" xyz="-0.000294 0 -0.010794"/>
@@ -319,9 +582,9 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_ankle_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_ankle_pitch_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
@@ -342,16 +605,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_ankle_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_ankle_roll_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_ankle_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_ankle_roll_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -372,16 +635,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/torso_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//torso_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/torso_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//torso_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -392,10 +655,64 @@
     <axis xyz="0 0 1"/>
     <limit effort="200" lower="-2.35" upper="2.35" velocity="23"/>
   </joint>
-  <!-- <xacro:include filename="skin/torso_skin.xacro" /> -->
-  <!-- <xacro:torso_skin parent="torso_link" namespace="torso" /> -->
-  <!-- <xacro:include filename="skin/head_skin.xacro" /> -->
-  <!-- <xacro:head_skin parent="torso_link" namespace="head" /> -->
+  <!--
+  <xacro:include filename="skin/tof/torso_skin.xacro" />
+  <xacro:torso_skin parent="torso_link" namespace="torso" />
+  -->
+  <!-- [m] -->
+  <link name="head_skin">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/skin/tof/head.stl" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="head_base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="torso_link"/>
+    <child link="head_skin"/>
+  </joint>
+  <joint name="head_sensor_0_joint" type="fixed">
+    <origin rpy="0.005 0.033 0.000" xyz="0.049 0.001 0.775"/>
+    <axis xyz="0.032994 -0.005 0.999443"/>
+    <parent link="head_skin"/>
+    <child link="head_sensor_0"/>
+  </joint>
+  <link name="head_sensor_0">
+  </link>
+  <joint name="head_sensor_1_joint" type="fixed">
+    <origin rpy="-0.013 1.155 -0.012" xyz="0.129 0.003 0.721"/>
+    <axis xyz="0.914808 0.002022 0.403884"/>
+    <parent link="head_skin"/>
+    <child link="head_sensor_1"/>
+  </joint>
+  <link name="head_sensor_1">
+  </link>
+  <joint name="head_sensor_2_joint" type="fixed">
+    <origin rpy="1.048 0.109 0.187" xyz="0.059 -0.069 0.741"/>
+    <axis xyz="0.214449 -0.841223 0.496342"/>
+    <parent link="head_skin"/>
+    <child link="head_sensor_2"/>
+  </joint>
+  <link name="head_sensor_2">
+  </link>
+  <joint name="head_sensor_4_joint" type="fixed">
+    <origin rpy="-1.018 -0.011 0.017" xyz="0.044 0.070 0.743"/>
+    <axis xyz="-0.020242 0.850838 0.525037"/>
+    <parent link="head_skin"/>
+    <child link="head_sensor_4"/>
+  </joint>
+  <link name="head_sensor_4">
+  </link>
+  <joint name="head_sensor_3_joint" type="fixed">
+    <origin rpy="0.386 -0.878 -0.303" xyz="-0.029 -0.003 0.744"/>
+    <axis xyz="-0.792712 -0.146632 0.591698"/>
+    <parent link="head_skin"/>
+    <child link="head_sensor_3"/>
+  </joint>
+  <link name="head_sensor_3">
+  </link>
   <!-- L arm -->
   <link name="left_shoulder_pitch_link">
     <inertial>
@@ -406,16 +723,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_shoulder_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_shoulder_pitch_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_shoulder_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_shoulder_pitch_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -435,16 +752,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_shoulder_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_shoulder_roll_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_shoulder_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_shoulder_roll_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -455,8 +772,68 @@
     <axis xyz="1 0 0"/>
     <limit effort="40" lower="-0.38" upper="3.4" velocity="9"/>
   </joint>
-  <!-- <xacro:include filename="./skin/shoulder_roll_L_skin.xacro" /> -->
-  <!-- <xacro:shoulder_roll_L_skin parent="left_shoulder_roll_link" namespace="left_shoulder_roll" /> -->
+  <!-- [m] -->
+  <link name="left_shoulder_roll_skin">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/skin/tof/shoulder_roll_L_skin.stl" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="left_shoulder_roll_base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="left_shoulder_roll_link"/>
+    <child link="left_shoulder_roll_skin"/>
+  </joint>
+  <joint name="left_shoulder_roll_sensor_0_joint" type="fixed">
+    <origin rpy="-1.574 -0.072 -1.524" xyz="0.019 -0.001 0.022"/>
+    <axis xyz="0.046658 -0.996317 0.071938"/>
+    <parent link="left_shoulder_roll_skin"/>
+    <child link="left_shoulder_roll_sensor_0"/>
+  </joint>
+  <link name="left_shoulder_roll_sensor_0">
+  </link>
+  <joint name="left_shoulder_roll_sensor_1_joint" type="fixed">
+    <origin rpy="-1.642 -0.107 -0.982" xyz="0.015 0.031 -0.046"/>
+    <axis xyz="0.552184 -0.826854 0.106796"/>
+    <parent link="left_shoulder_roll_skin"/>
+    <child link="left_shoulder_roll_sensor_1"/>
+  </joint>
+  <link name="left_shoulder_roll_sensor_1">
+  </link>
+  <joint name="left_shoulder_roll_sensor_2_joint" type="fixed">
+    <origin rpy="1.637 -0.095 0.962" xyz="0.013 -0.034 -0.049"/>
+    <axis xyz="0.569302 0.816638 0.094857"/>
+    <parent link="left_shoulder_roll_skin"/>
+    <child link="left_shoulder_roll_sensor_2"/>
+  </joint>
+  <link name="left_shoulder_roll_sensor_2">
+  </link>
+  <joint name="left_shoulder_roll_sensor_3_joint" type="fixed">
+    <origin rpy="-1.561 0.100 -1.470" xyz="0.019 0.000 -0.100"/>
+    <axis xyz="0.100123 -0.989954 -0.099833"/>
+    <parent link="left_shoulder_roll_skin"/>
+    <child link="left_shoulder_roll_sensor_3"/>
+  </joint>
+  <link name="left_shoulder_roll_sensor_3">
+  </link>
+  <joint name="left_shoulder_roll_sensor_4_joint" type="fixed">
+    <origin rpy="-1.566 -0.001 0.214" xyz="-0.039 0.052 -0.112"/>
+    <axis xyz="0.977189 0.21237 0.001"/>
+    <parent link="left_shoulder_roll_skin"/>
+    <child link="left_shoulder_roll_sensor_4"/>
+  </joint>
+  <link name="left_shoulder_roll_sensor_4">
+  </link>
+  <joint name="left_shoulder_roll_sensor_5_joint" type="fixed">
+    <origin rpy="1.572 0.000 -0.184" xyz="-0.041 -0.052 -0.113"/>
+    <axis xyz="0.98312 -0.182964 0.0"/>
+    <parent link="left_shoulder_roll_skin"/>
+    <child link="left_shoulder_roll_sensor_5"/>
+  </joint>
+  <link name="left_shoulder_roll_sensor_5">
+  </link>
   <link name="left_shoulder_yaw_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0.004583 0.001128 -0.001128"/>
@@ -466,16 +843,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_shoulder_yaw_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_shoulder_yaw_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_shoulder_yaw_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_shoulder_yaw_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -486,8 +863,68 @@
     <axis xyz="0 0 1"/>
     <limit effort="18" lower="-2.66" upper="3.01" velocity="20"/>
   </joint>
-  <!-- <xacro:include filename="./skin/shoulder_yaw_L_skin.xacro" /> -->
-  <!-- <xacro:shoulder_yaw_L_skin parent="left_shoulder_yaw_link" namespace="left_shoulder_yaw" /> -->
+  <!-- [m] -->
+  <link name="left_shoulder_yaw_skin">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/skin/tof/left_shoulder_yaw_link_skin.stl" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="left_shoulder_yaw_base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="left_shoulder_yaw_link"/>
+    <child link="left_shoulder_yaw_skin"/>
+  </joint>
+  <joint name="left_shoulder_yaw_sensor_0_joint" type="fixed">
+    <origin rpy="-1.633 -0.056 -0.731" xyz="0.031 0.034 -0.032"/>
+    <axis xyz="0.668914 0.740744 -0.062066"/>
+    <parent link="left_shoulder_yaw_skin"/>
+    <child link="left_shoulder_yaw_sensor_0"/>
+  </joint>
+  <link name="left_shoulder_yaw_sensor_0">
+  </link>
+  <joint name="left_shoulder_yaw_sensor_1_joint" type="fixed">
+    <origin rpy="-1.713 0.008 0.057" xyz="-0.006 0.044 -0.034"/>
+    <axis xyz="-0.057526 0.988234 -0.14172"/>
+    <parent link="left_shoulder_yaw_skin"/>
+    <child link="left_shoulder_yaw_sensor_1"/>
+  </joint>
+  <link name="left_shoulder_yaw_sensor_1">
+  </link>
+  <joint name="left_shoulder_yaw_sensor_2_joint" type="fixed">
+    <origin rpy="-1.832 0.024 0.089" xyz="-0.016 0.034 -0.073"/>
+    <axis xyz="-0.09204 0.961705 -0.258169"/>
+    <parent link="left_shoulder_yaw_skin"/>
+    <child link="left_shoulder_yaw_sensor_2"/>
+  </joint>
+  <link name="left_shoulder_yaw_sensor_2">
+  </link>
+  <joint name="left_shoulder_yaw_sensor_3_joint" type="fixed">
+    <origin rpy="-1.572 0.003 1.343" xyz="-0.045 0.011 -0.035"/>
+    <axis xyz="-0.974167 0.225828 -0.001204"/>
+    <parent link="left_shoulder_yaw_skin"/>
+    <child link="left_shoulder_yaw_sensor_3"/>
+  </joint>
+  <link name="left_shoulder_yaw_sensor_3">
+  </link>
+  <joint name="left_shoulder_yaw_sensor_4_joint" type="fixed">
+    <origin rpy="3.142 1.571 0.000" xyz="-0.046 -0.002 -0.097"/>
+    <axis xyz="-1.0 0.000407 0.000204"/>
+    <parent link="left_shoulder_yaw_skin"/>
+    <child link="left_shoulder_yaw_sensor_4"/>
+  </joint>
+  <link name="left_shoulder_yaw_sensor_4">
+  </link>
+  <joint name="left_shoulder_yaw_sensor_5_joint" type="fixed">
+    <origin rpy="1.536 -0.016 -0.427" xyz="-0.021 -0.042 -0.029"/>
+    <axis xyz="-0.414398 -0.909431 0.034785"/>
+    <parent link="left_shoulder_yaw_skin"/>
+    <child link="left_shoulder_yaw_sensor_5"/>
+  </joint>
+  <link name="left_shoulder_yaw_sensor_5">
+  </link>
   <link name="left_elbow_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0.077092 -0.028751 -0.009714 "/>
@@ -497,16 +934,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_elbow_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_elbow_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_elbow_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_elbow_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -517,8 +954,84 @@
     <axis xyz="0 1 0"/>
     <limit effort="18" lower="-0.95" upper="3.18" velocity="20"/>
   </joint>
-  <!-- <xacro:include filename="./skin/elbow_L_skin.xacro" /> -->
-  <!-- <xacro:elbow_L_skin parent="left_elbow_link" namespace="left_elbow" /> -->
+  <!-- [m] -->
+  <link name="left_elbow_skin">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/skin/tof/elbow_L_skin.stl" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="left_elbow_base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="left_elbow_link"/>
+    <child link="left_elbow_skin"/>
+  </joint>
+  <joint name="left_elbow_sensor_0_joint" type="fixed">
+    <origin rpy="-1.643 0.053 0.634" xyz="-0.045 0.011 -0.005"/>
+    <axis xyz="-0.593908 0.801301 -0.07204"/>
+    <parent link="left_elbow_skin"/>
+    <child link="left_elbow_sensor_0"/>
+  </joint>
+  <link name="left_elbow_sensor_0">
+  </link>
+  <joint name="left_elbow_sensor_1_joint" type="fixed">
+    <origin rpy="-1.078 -0.020 0.037" xyz="-0.001 0.013 0.042"/>
+    <axis xyz="-0.042045 0.88006 0.472997"/>
+    <parent link="left_elbow_skin"/>
+    <child link="left_elbow_sensor_1"/>
+  </joint>
+  <link name="left_elbow_sensor_1">
+  </link>
+  <joint name="left_elbow_sensor_2_joint" type="fixed">
+    <origin rpy="-2.198 -0.022 -0.031" xyz="0.002 0.012 -0.044"/>
+    <axis xyz="0.038 0.808883 -0.586741"/>
+    <parent link="left_elbow_skin"/>
+    <child link="left_elbow_sensor_2"/>
+  </joint>
+  <link name="left_elbow_sensor_2">
+  </link>
+  <joint name="left_elbow_sensor_3_joint" type="fixed">
+    <origin rpy="-1.572 0.000 -0.017" xyz="0.002 0.017 -0.003"/>
+    <axis xyz="0.016999 0.999855 -0.001204"/>
+    <parent link="left_elbow_skin"/>
+    <child link="left_elbow_sensor_3"/>
+  </joint>
+  <link name="left_elbow_sensor_3">
+  </link>
+  <joint name="left_elbow_sensor_4_joint" type="fixed">
+    <origin rpy="-1.570 0.000 -0.144" xyz="0.048 0.014 -0.005"/>
+    <axis xyz="0.143503 0.98965 0.000796"/>
+    <parent link="left_elbow_skin"/>
+    <child link="left_elbow_sensor_4"/>
+  </joint>
+  <link name="left_elbow_sensor_4">
+  </link>
+  <joint name="left_elbow_sensor_5_joint" type="fixed">
+    <origin rpy="-1.542 0.000 -0.017" xyz="0.095 0.010 -0.008"/>
+    <axis xyz="0.016992 0.999441 0.028792"/>
+    <parent link="left_elbow_skin"/>
+    <child link="left_elbow_sensor_5"/>
+  </joint>
+  <link name="left_elbow_sensor_5">
+  </link>
+  <joint name="left_elbow_sensor_6_joint" type="fixed">
+    <origin rpy="-0.179 0.036 -0.007" xyz="0.089 -0.021 0.031"/>
+    <axis xyz="0.036663 0.177793 0.983385"/>
+    <parent link="left_elbow_skin"/>
+    <child link="left_elbow_sensor_6"/>
+  </joint>
+  <link name="left_elbow_sensor_6">
+  </link>
+  <joint name="left_elbow_sensor_7_joint" type="fixed">
+    <origin rpy="-3.032 -0.022 -0.002" xyz="0.089 -0.026 -0.054"/>
+    <axis xyz="0.022085 0.109329 -0.99376"/>
+    <parent link="left_elbow_skin"/>
+    <child link="left_elbow_sensor_7"/>
+  </joint>
+  <link name="left_elbow_sensor_7">
+  </link>
   <link name="left_wrist_roll_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0.035281 -0.002320 0.000337"/>
@@ -528,15 +1041,15 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_wrist_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_wrist_roll_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_wrist_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_wrist_roll_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -556,15 +1069,15 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_wrist_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_wrist_pitch_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/left_wrist_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//left_wrist_pitch_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -584,9 +1097,9 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/wrist_yaw_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//wrist_yaw_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
@@ -614,16 +1127,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_shoulder_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_shoulder_pitch_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_shoulder_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_shoulder_pitch_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -643,16 +1156,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_shoulder_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_shoulder_roll_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_shoulder_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_shoulder_roll_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -668,70 +1181,62 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_descriptions_hybrid/robots/h1-2/meshes/skin/tof/shoulder_roll_R_skin.stl" scale="1 1 1"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/skin/tof/shoulder_roll_R_skin.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
   <joint name="right_shoulder_roll_base_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="-0.0342 0.2095 -0.43358"/>
+    <origin rpy="0 0 0" xyz="0 0 0"/>
     <parent link="right_shoulder_roll_link"/>
     <child link="right_shoulder_roll_skin"/>
   </joint>
   <joint name="right_shoulder_roll_sensor_0_joint" type="fixed">
-    <origin rpy="-1.566 -0.001 0.214" xyz="-0.033 0.049 -0.099"/>
-    <axis xyz="0.977189 0.21237 0.001"/>
+    <origin rpy="-1.574 -0.072 -1.524" xyz="0.019 -0.001 0.022"/>
+    <axis xyz="0.046658 -0.996317 0.071938"/>
     <parent link="right_shoulder_roll_skin"/>
     <child link="right_shoulder_roll_sensor_0"/>
   </joint>
   <link name="right_shoulder_roll_sensor_0">
   </link>
   <joint name="right_shoulder_roll_sensor_1_joint" type="fixed">
-    <origin rpy="1.570 0.000 0.133" xyz="-0.026 -0.049 -0.100"/>
-    <axis xyz="0.991169 0.132608 -0.0"/>
+    <origin rpy="-1.642 -0.107 -0.982" xyz="0.015 0.031 -0.046"/>
+    <axis xyz="0.552184 -0.826854 0.106796"/>
     <parent link="right_shoulder_roll_skin"/>
     <child link="right_shoulder_roll_sensor_1"/>
   </joint>
   <link name="right_shoulder_roll_sensor_1">
   </link>
   <joint name="right_shoulder_roll_sensor_2_joint" type="fixed">
-    <origin rpy="-1.574 -0.072 -1.524" xyz="0.017 -0.000 -0.028"/>
-    <axis xyz="0.046658 -0.996317 0.071938"/>
+    <origin rpy="1.637 -0.095 0.962" xyz="0.013 -0.034 -0.049"/>
+    <axis xyz="0.569302 0.816638 0.094857"/>
     <parent link="right_shoulder_roll_skin"/>
     <child link="right_shoulder_roll_sensor_2"/>
   </joint>
   <link name="right_shoulder_roll_sensor_2">
   </link>
   <joint name="right_shoulder_roll_sensor_3_joint" type="fixed">
-    <origin rpy="1.637 -0.095 0.962" xyz="0.012 -0.026 -0.091"/>
-    <axis xyz="0.569302 0.816638 0.094857"/>
+    <origin rpy="-1.561 0.100 -1.470" xyz="0.019 0.000 -0.100"/>
+    <axis xyz="0.100123 -0.989954 -0.099833"/>
     <parent link="right_shoulder_roll_skin"/>
     <child link="right_shoulder_roll_sensor_3"/>
   </joint>
   <link name="right_shoulder_roll_sensor_3">
   </link>
   <joint name="right_shoulder_roll_sensor_4_joint" type="fixed">
-    <origin rpy="-1.638 -0.105 -1.000" xyz="0.008 0.032 -0.085"/>
-    <axis xyz="0.537327 -0.836837 0.104807"/>
+    <origin rpy="-1.566 -0.001 0.214" xyz="-0.039 0.052 -0.112"/>
+    <axis xyz="0.977189 0.21237 0.001"/>
     <parent link="right_shoulder_roll_skin"/>
     <child link="right_shoulder_roll_sensor_4"/>
   </joint>
   <link name="right_shoulder_roll_sensor_4">
   </link>
   <joint name="right_shoulder_roll_sensor_5_joint" type="fixed">
-    <origin rpy="1.637 -0.095 0.964" xyz="0.013 -0.035 -0.006"/>
-    <axis xyz="0.537327 -0.836837 0.104807"/>
+    <origin rpy="1.572 0.000 -0.184" xyz="-0.041 -0.052 -0.113"/>
+    <axis xyz="0.98312 -0.182964 0.0"/>
     <parent link="right_shoulder_roll_skin"/>
     <child link="right_shoulder_roll_sensor_5"/>
   </joint>
   <link name="right_shoulder_roll_sensor_5">
-  </link>
-  <joint name="right_shoulder_roll_sensor_6_joint" type="fixed">
-    <origin rpy="-1.508 0.094 -0.984" xyz="0.011 0.037 -0.002"/>
-    <axis xyz="0.537327 -0.836837 0.104807"/>
-    <parent link="right_shoulder_roll_skin"/>
-    <child link="right_shoulder_roll_sensor_6"/>
-  </joint>
-  <link name="right_shoulder_roll_sensor_6">
   </link>
   <link name="right_shoulder_yaw_link">
     <inertial>
@@ -742,16 +1247,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_shoulder_yaw_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_shoulder_yaw_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_shoulder_yaw_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_shoulder_yaw_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -762,8 +1267,68 @@
     <axis xyz="0 0 1"/>
     <limit effort="18" lower="-3.01" upper="2.66" velocity="20"/>
   </joint>
-  <!-- <xacro:include filename="./skin/shoulder_yaw_R_skin.xacro" /> -->
-  <!-- <xacro:shoulder_yaw_R_skin parent="right_shoulder_yaw_link" namespace="right_shoulder_yaw" /> -->
+  <!-- [m] -->
+  <link name="right_shoulder_yaw_skin">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/skin/tof/shoulder_yaw_R_skin.stl" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="right_shoulder_yaw_base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="right_shoulder_yaw_link"/>
+    <child link="right_shoulder_yaw_skin"/>
+  </joint>
+  <joint name="right_shoulder_yaw_sensor_0_joint" type="fixed">
+    <origin rpy="1.633 -0.056 0.731" xyz="0.031 -0.034 -0.032"/>
+    <axis xyz="0.668914 -0.740744 -0.062066"/>
+    <parent link="right_shoulder_yaw_skin"/>
+    <child link="right_shoulder_yaw_sensor_0"/>
+  </joint>
+  <link name="right_shoulder_yaw_sensor_0">
+  </link>
+  <joint name="right_shoulder_yaw_sensor_1_joint" type="fixed">
+    <origin rpy="1.713 0.008 -0.057" xyz="-0.006 -0.044 -0.034"/>
+    <axis xyz="-0.057526 -0.988234 -0.14172"/>
+    <parent link="right_shoulder_yaw_skin"/>
+    <child link="right_shoulder_yaw_sensor_1"/>
+  </joint>
+  <link name="right_shoulder_yaw_sensor_1">
+  </link>
+  <joint name="right_shoulder_yaw_sensor_2_joint" type="fixed">
+    <origin rpy="1.832 0.024 -0.089" xyz="-0.016 -0.034 -0.073"/>
+    <axis xyz="-0.09204 -0.961705 -0.258169"/>
+    <parent link="right_shoulder_yaw_skin"/>
+    <child link="right_shoulder_yaw_sensor_2"/>
+  </joint>
+  <link name="right_shoulder_yaw_sensor_2">
+  </link>
+  <joint name="right_shoulder_yaw_sensor_3_joint" type="fixed">
+    <origin rpy="1.572 0.003 -1.343" xyz="-0.045 -0.011 -0.035"/>
+    <axis xyz="-0.974167 -0.225828 -0.001204"/>
+    <parent link="right_shoulder_yaw_skin"/>
+    <child link="right_shoulder_yaw_sensor_3"/>
+  </joint>
+  <link name="right_shoulder_yaw_sensor_3">
+  </link>
+  <joint name="right_shoulder_yaw_sensor_4_joint" type="fixed">
+    <origin rpy="-3.142 1.571 0.000" xyz="-0.046 0.002 -0.097"/>
+    <axis xyz="-1.0 -0.000407 0.000204"/>
+    <parent link="right_shoulder_yaw_skin"/>
+    <child link="right_shoulder_yaw_sensor_4"/>
+  </joint>
+  <link name="right_shoulder_yaw_sensor_4">
+  </link>
+  <joint name="right_shoulder_yaw_sensor_5_joint" type="fixed">
+    <origin rpy="-1.536 -0.016 0.427" xyz="-0.021 0.042 -0.029"/>
+    <axis xyz="-0.414398 0.909431 0.034785"/>
+    <parent link="right_shoulder_yaw_skin"/>
+    <child link="right_shoulder_yaw_sensor_5"/>
+  </joint>
+  <link name="right_shoulder_yaw_sensor_5">
+  </link>
   <link name="right_elbow_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0.077092 0.028751 -0.009714 "/>
@@ -773,16 +1338,16 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_elbow_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_elbow_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_elbow_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_elbow_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -793,8 +1358,84 @@
     <axis xyz="0 1 0"/>
     <limit effort="18" lower="-0.95" upper="3.18" velocity="20"/>
   </joint>
-  <!-- <xacro:include filename="./skin/elbow_R_skin.xacro" /> -->
-  <!-- <xacro:elbow_R_skin parent="right_elbow_link" namespace="right_elbow" /> -->
+  <!-- [m] -->
+  <link name="right_elbow_skin">
+    <visual>
+      <origin rpy="0 0 0" xyz="0 0 0"/>
+      <geometry>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/skin/tof/right_elbow_link_skin.stl" scale="1 1 1"/>
+      </geometry>
+    </visual>
+  </link>
+  <joint name="right_elbow_base_joint" type="fixed">
+    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <parent link="right_elbow_link"/>
+    <child link="right_elbow_skin"/>
+  </joint>
+  <joint name="right_elbow_sensor_0_joint" type="fixed">
+    <origin rpy="1.643 0.053 -0.634" xyz="-0.045 -0.011 -0.005"/>
+    <axis xyz="-0.593908 -0.801301 -0.07204"/>
+    <parent link="right_elbow_skin"/>
+    <child link="right_elbow_sensor_0"/>
+  </joint>
+  <link name="right_elbow_sensor_0">
+  </link>
+  <joint name="right_elbow_sensor_1_joint" type="fixed">
+    <origin rpy="1.078 -0.020 -0.037" xyz="-0.001 -0.013 0.042"/>
+    <axis xyz="-0.042045 -0.88006 0.472997"/>
+    <parent link="right_elbow_skin"/>
+    <child link="right_elbow_sensor_1"/>
+  </joint>
+  <link name="right_elbow_sensor_1">
+  </link>
+  <joint name="right_elbow_sensor_2_joint" type="fixed">
+    <origin rpy="2.198 -0.022 0.031" xyz="0.002 -0.012 -0.044"/>
+    <axis xyz="0.038 -0.808883 -0.586741"/>
+    <parent link="right_elbow_skin"/>
+    <child link="right_elbow_sensor_2"/>
+  </joint>
+  <link name="right_elbow_sensor_2">
+  </link>
+  <joint name="right_elbow_sensor_3_joint" type="fixed">
+    <origin rpy="1.572 0.000 0.017" xyz="0.002 -0.017 -0.003"/>
+    <axis xyz="0.016999 -0.999855 -0.001204"/>
+    <parent link="right_elbow_skin"/>
+    <child link="right_elbow_sensor_3"/>
+  </joint>
+  <link name="right_elbow_sensor_3">
+  </link>
+  <joint name="right_elbow_sensor_4_joint" type="fixed">
+    <origin rpy="1.570 0.000 0.144" xyz="0.048 -0.014 -0.005"/>
+    <axis xyz="0.143503 -0.98965 0.000796"/>
+    <parent link="right_elbow_skin"/>
+    <child link="right_elbow_sensor_4"/>
+  </joint>
+  <link name="right_elbow_sensor_4">
+  </link>
+  <joint name="right_elbow_sensor_5_joint" type="fixed">
+    <origin rpy="1.542 0.000 0.017" xyz="0.095 -0.010 -0.008"/>
+    <axis xyz="0.016992 -0.999441 0.028792"/>
+    <parent link="right_elbow_skin"/>
+    <child link="right_elbow_sensor_5"/>
+  </joint>
+  <link name="right_elbow_sensor_5">
+  </link>
+  <joint name="right_elbow_sensor_6_joint" type="fixed">
+    <origin rpy="0.179 0.036 0.007" xyz="0.089 0.021 0.031"/>
+    <axis xyz="0.036663 -0.177793 0.983385"/>
+    <parent link="right_elbow_skin"/>
+    <child link="right_elbow_sensor_6"/>
+  </joint>
+  <link name="right_elbow_sensor_6">
+  </link>
+  <joint name="right_elbow_sensor_7_joint" type="fixed">
+    <origin rpy="3.032 -0.022 0.002" xyz="0.089 0.026 -0.054"/>
+    <axis xyz="0.022085 -0.109329 -0.99376"/>
+    <parent link="right_elbow_skin"/>
+    <child link="right_elbow_sensor_7"/>
+  </joint>
+  <link name="right_elbow_sensor_7">
+  </link>
   <link name="right_wrist_roll_link">
     <inertial>
       <origin rpy="0 0 0" xyz="0.035281 -0.002320 0.000337"/>
@@ -804,15 +1445,15 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_wrist_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_wrist_roll_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_wrist_roll_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_wrist_roll_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -832,15 +1473,15 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_wrist_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_wrist_pitch_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
     <collision>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/right_wrist_pitch_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//right_wrist_pitch_link.STL"/>
       </geometry>
     </collision>
   </link>
@@ -860,9 +1501,9 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/wrist_yaw_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//wrist_yaw_link.STL"/>
       </geometry>
-      <material name="grey">
+      <material>
         <color rgba="0.1 0.1 0.1 1"/>
       </material>
     </visual>
@@ -885,9 +1526,9 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2/logo_link.STL"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/h1_2//logo_link.STL"/>
       </geometry>
-      <material name="white">
+      <material>
         <color rgba="1 1 1 1"/>
       </material>
     </visual>

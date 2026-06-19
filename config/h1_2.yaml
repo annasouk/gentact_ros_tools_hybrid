@@ -4,6 +4,7 @@ robot:
   joint_relay: false
   joint_publisher: false
   robot_ip: "192.168.0.100" # Only used for joint relay. Ignore if joint relay is false.
+  # robot_xacro: "robots/h1-2/h1_2_handless_tof.xacro" #
   robot_xacro: "urdf/compiled/h1_2_handless_tof.urdf" # Make sure the skin xacros are included in this file!
   self_detection: false
   end_effector:
@@ -67,6 +68,14 @@ sensors:
     xacro: "" # Defined relative to the gentact_ros_tools_hybrid package. Leave empty to not display.
     wireless: false
     port: 5005
+  elbow_R_skin:
+    active: true
+    type: "SPAD"
+    SN: "S2"
+    num_sensors: 8
+    xacro: ""
+    wireless: false
+    port: 5006
 
 prediction:
   active: false
