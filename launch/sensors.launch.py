@@ -117,16 +117,16 @@ def build_robot(config, use_sim_time, robot_description):
             )
         )
 
-    # if config["robot"]["joint_publisher"]:
-    #     robot_nodes.append(
-    #         Node(
-    #             package="joint_state_publisher",
-    #             executable="joint_state_publisher",
-    #             name="robot_joint_states",
-    #             output="screen",
-    #             parameters=[{"use_sim_time": use_sim_time}],
-    #         )
-    #     )
+    if config["robot"]["joint_publisher"]:
+        robot_nodes.append(
+            Node(
+                package="joint_state_publisher",
+                executable="joint_state_publisher",
+                name="robot_joint_states",
+                output="screen",
+                parameters=[{"use_sim_time": use_sim_time}],
+            )
+        )
     return robot_nodes
 
 
