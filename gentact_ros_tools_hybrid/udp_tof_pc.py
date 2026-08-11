@@ -58,7 +58,7 @@ class UDP_PC_Publisher(Node):
             self.get_parameter("timeout_seconds").get_parameter_value().double_value
         )
         self.link = self.get_parameter("link").get_parameter_value().string_value
-        self.link_num = "".join(filter(lambda x: x.isdigit(), self.link))
+        #self.link_num = "".join(filter(lambda x: x.isdigit(), self.link))
         self.num_sensors = (
             self.get_parameter("num_sensors").get_parameter_value().integer_value
         )
@@ -112,13 +112,13 @@ class UDP_PC_Publisher(Node):
         """Get existing publisher or create new one for device"""
         if device_id not in self.device_publishers:
             # Create new publisher for this device
-            topic_name = f"link{self.link}_sensor_{sensor_id}"
+            topic_name = f"{self.link}_sensor_{sensor_id}"
             # topic_name = f'link{self.link}_sensor_{sensor_id}'
             if self.publish_type == "pointcloud":
                 publisher = self.create_publisher(PointCloud2, topic_name, 1)
             else:
                 publisher = self.create_publisher(Float64MultiArray, topic_name, 1)
-            device_id = f"link{self.link}_sensor_{sensor_id}"
+            device_id = f"{self.link}_sensor_{sensor_id}"
             self.device_publishers[device_id] = publisher
             self.device_last_seen[device_id] = time.time()
             self.device_receive_counts[device_id] = 0
@@ -192,7 +192,7 @@ class UDP_PC_Publisher(Node):
             mm = np.frombuffer(data[1 : 1 + NUM_PIXELS * 2], dtype=np.uint16) / 1000.0
             return {
                 "sensor_id": sensor_id,
-                "device_id": f"link{self.link}_sensor_{sensor_id}",
+                "device_id": f"{self.link}_sensor_{sensor_id}",
                 "data": mm,
             }
 
@@ -268,7 +268,7 @@ class UDP_PC_Publisher(Node):
                 pc_msg = PointCloud2(
                     header=Header(
                         stamp=self.get_clock().now().to_msg(),
-                        frame_id=f"link{self.link}_sensor_{sensor_id}",
+                        frame_id=f"{self.link}_sensor_{sensor_id}",
                     ),
                     height=1,
                     width=sensor_pts.shape[0],

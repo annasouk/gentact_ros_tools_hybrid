@@ -4,7 +4,7 @@ robot:
   joint_relay: false
   joint_publisher: true
   robot_ip: "192.168.0.100" # Only used for joint relay. Ignore if joint relay is false.
-  # robot_xacro: "robots/go-1/xacro/robot.xacro"
+  #robot_xacro: "robots/go-1/xacro/robot.xacro"
   robot_xacro: "urdf/compiled/go-1/go1_tof_skins.urdf" # Make sure the skin xacros are included in this file!
   self_detection: false
   end_effector:
@@ -26,14 +26,14 @@ sensors:
 
   # All links defined as in xacro: i.e. '${robot.arm_id}_${link_name}' -> 'fr3_link1'
   # Launch will search for these links and activate if they are found in the xacro file.
-  trunk_head_skin: # The name of the link needs to match the name of the link in the xacro file. ex: <link name="link1"/>
-    active: false
+  trunk_head: # The name of the link needs to match the name of the link in the xacro file. ex: <link name="link1"/>
+    active: true
     type: "SPAD"
     SN: "S1" # Serial number of the sensor
     num_sensors: 5
     xacro: "" # Defined relative to the gentact_ros_tools_hybrid package. Leave empty to not display.
     wireless: false
-    port: 5004 
+    port: 5011
 
 prediction:
   active: false

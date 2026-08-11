@@ -438,33 +438,49 @@
     </visual>
   </link>
   <joint name="trunk_head_base_joint" type="fixed">
-    <origin rpy="0 0 0" xyz="0 0 0"/>
+    <origin rpy="0 0 1.570796" xyz="0.275155 0.001302 0.010202"/>
     <parent link="base"/>
     <child link="trunk_head_skin"/>
   </joint>
   <joint name="trunk_head_sensor_0_joint" type="fixed">
-    <origin rpy="-1.5642733573913574 -0.0002883475972339511 0.0441758893430233" xyz="-0.020546915009617805 0.016203830018639565 -0.13735900819301605"/>
-    <axis xyz="-1.5642733573913574 -0.0002883475972339511 0.0441758893430233"/>
+    <origin rpy="1.2075234651565552 -0.007908201776444912 -0.020799949765205383" xyz="0.00025236696819774806 -0.2968325912952423 0.04981664940714836"/>
+    <axis xyz="1.2075234651565552 -0.007908201776444912 -0.020799949765205383"/>
     <parent link="trunk_head_skin"/>
     <child link="trunk_head_sensor_0"/>
   </joint>
   <link name="trunk_head_sensor_0">
   </link>
   <joint name="trunk_head_sensor_1_joint" type="fixed">
-    <origin rpy="-1.6060417890548706 -0.0003777451638597995 -0.010712702758610249" xyz="-0.00846764538437128 0.016201069578528404 -0.046428292989730835"/>
-    <axis xyz="-1.6060417890548706 -0.0003777451638597995 -0.010712702758610249"/>
+    <origin rpy="1.1489475965499878 -0.39848679304122925 -0.7129077315330505" xyz="-0.03770412877202034 -0.2818562388420105 0.051483239978551865"/>
+    <axis xyz="1.1489475965499878 -0.39848679304122925 -0.7129077315330505"/>
     <parent link="trunk_head_skin"/>
     <child link="trunk_head_sensor_1"/>
   </joint>
   <link name="trunk_head_sensor_1">
   </link>
   <joint name="trunk_head_sensor_2_joint" type="fixed">
-    <origin rpy="-2.077631950378418 1.4713668823242188 1.0618557929992676" xyz="-0.0421280711889267 0.000184581644134596 -0.10028665512800217"/>
-    <axis xyz="1.6190142631530762 -0.024614643305540085 -1.5761873722076416"/>
+    <origin rpy="1.1440706253051758 0.4009367823600769 0.7093470692634583" xyz="0.03843432292342186 -0.28169137239456177 0.05167349427938461"/>
+    <axis xyz="1.1440706253051758 0.4009367823600769 0.7093470692634583"/>
     <parent link="trunk_head_skin"/>
     <child link="trunk_head_sensor_2"/>
   </joint>
   <link name="trunk_head_sensor_2">
+  </link>
+  <joint name="trunk_head_sensor_3_joint" type="fixed">
+    <origin rpy="1.494691252708435 -0.024021487683057785 -0.30515751242637634" xyz="-0.06460931897163391 -0.27623823285102844 0.0038362115155905485"/>
+    <axis xyz="1.494691252708435 -0.024021487683057785 -0.30515751242637634"/>
+    <parent link="trunk_head_skin"/>
+    <child link="trunk_head_sensor_3"/>
+  </joint>
+  <link name="trunk_head_sensor_3">
+  </link>
+  <joint name="trunk_head_sensor_4_joint" type="fixed">
+    <origin rpy="1.4878184795379639 0.02471890300512314 0.2888708710670471" xyz="0.06688925623893738 -0.2754700481891632 0.00686574075371027"/>
+    <axis xyz="1.4878184795379639 0.02471890300512314 0.2888708710670471"/>
+    <parent link="trunk_head_skin"/>
+    <child link="trunk_head_sensor_4"/>
+  </joint>
+  <link name="trunk_head_sensor_4">
   </link>
   <joint name="imu_joint" type="fixed">
     <parent link="trunk"/>
@@ -1408,7 +1424,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/go-1/skin/thighcap/left_thighcap_skin.stl" scale="1 1 1"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/go-1/skin/thigh/left_thighcap_skin.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
@@ -1418,7 +1434,7 @@
     <child link="left_thighcap_skin"/>
   </joint>
   <joint name="left_thighcap_sensor_0_joint" type="fixed">
-    <origin rpy="-1.2252006530761719 -0.005685813259333372 0.0157905425876379" xyz="0.006742224097251892 0.014293902553617954 0.029223144054412842"/>
+    <origin rpy="-1.2252006530761719 -0.005685813259333372 0.0157905425876379" xyz="0.0010693295625969768 -0.006162808742374182 0.046794019639492035"/>
     <axis xyz="0.07606421411037445 1.224162220954895 1.6694881916046143"/>
     <parent link="left_thighcap_skin"/>
     <child link="left_thighcap_sensor_0"/>
@@ -1426,7 +1442,7 @@
   <link name="left_thighcap_sensor_0">
   </link>
   <joint name="left_thighcap_sensor_1_joint" type="fixed">
-    <origin rpy="-1.3508657217025757 -0.3039449453353882 0.9292620420455933" xyz="-0.037725191563367844 -0.0013956413604319096 0.008954118005931377"/>
+    <origin rpy="-1.3508657217025757 -0.3039449453353882 0.9292620420455933" xyz="-0.0425979383289814 -0.008709190413355827 0.021811174228787422"/>
     <axis xyz="-1.3070464134216309 0.6460541486740112 1.1572322845458984"/>
     <parent link="left_thighcap_skin"/>
     <child link="left_thighcap_sensor_1"/>
@@ -1434,7 +1450,7 @@
   <link name="left_thighcap_sensor_1">
   </link>
   <joint name="left_thighcap_sensor_2_joint" type="fixed">
-    <origin rpy="-2.012596607208252 0.012588809244334698 0.026608869433403015" xyz="0.0007210002513602376 0.013414165005087852 -0.016765158623456955"/>
+    <origin rpy="-2.012596607208252 0.012588809244334698 0.026608869433403015" xyz="-0.004939308390021324 0.01649658940732479 0.0077791460789740086"/>
     <axis xyz="0.020896799862384796 2.012662410736084 1.626475214958191"/>
     <parent link="left_thighcap_skin"/>
     <child link="left_thighcap_sensor_2"/>
@@ -1446,7 +1462,7 @@
     <visual>
       <origin rpy="0 0 0" xyz="0 0 0"/>
       <geometry>
-        <mesh filename="package://gentact_ros_tools_hybrid/meshes/go-1/skin/thighcap/right_thighcap_skin.stl" scale="1 1 1"/>
+        <mesh filename="package://gentact_ros_tools_hybrid/meshes/go-1/skin/thigh/right_thighcap_skin.stl" scale="1 1 1"/>
       </geometry>
     </visual>
   </link>
@@ -1456,7 +1472,7 @@
     <child link="right_thighcap_skin"/>
   </joint>
   <joint name="right_thighcap_sensor_0_joint" type="fixed">
-    <origin rpy="-1.2252006530761719 -0.005685813259333372 0.0157905425876379" xyz="0.006742224097251892 -0.014293902553617954 0.029223144054412842"/>
+    <origin rpy="-1.2252006530761719 -0.005685813259333372 0.0157905425876379" xyz="0.0010693295625969768 0.007912559434771538 0.046794019639492035"/>
     <axis xyz="0.07606421411037445 1.224162220954895 1.6694881916046143"/>
     <parent link="right_thighcap_skin"/>
     <child link="right_thighcap_sensor_0"/>
@@ -1464,7 +1480,7 @@
   <link name="right_thighcap_sensor_0">
   </link>
   <joint name="right_thighcap_sensor_1_joint" type="fixed">
-    <origin rpy="-1.3508657217025757 -0.3039449453353882 0.9292620420455933" xyz="-0.037725191563367844 0.0013956413604319096 0.008954118005931377"/>
+    <origin rpy="-1.3508657217025757 -0.3039449453353882 0.9292620420455933" xyz="-0.0425979383289814 0.009698150679469109 0.021811174228787422"/>
     <axis xyz="-1.3070464134216309 0.6460541486740112 1.1572322845458984"/>
     <parent link="right_thighcap_skin"/>
     <child link="right_thighcap_sensor_1"/>
@@ -1472,7 +1488,7 @@
   <link name="right_thighcap_sensor_1">
   </link>
   <joint name="right_thighcap_sensor_2_joint" type="fixed">
-    <origin rpy="-2.012596607208252 0.012588809244334698 0.026608869433403015" xyz="0.0007210002513602376 -0.013414165005087852 -0.016765158623456955"/>
+    <origin rpy="-2.012596607208252 0.012588809244334698 0.026608869433403015" xyz="-0.004939308390021324 -0.01481604017317295 0.0077791460789740086"/>
     <axis xyz="0.020896799862384796 2.012662410736084 1.626475214958191"/>
     <parent link="right_thighcap_skin"/>
     <child link="right_thighcap_sensor_2"/>

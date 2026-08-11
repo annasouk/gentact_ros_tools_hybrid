@@ -168,9 +168,6 @@ def build_sensor_nodes(config, sensor_port_mapping):
         if isinstance(sensor_config, dict) and sensor_config.get("active", False):
             if sensor_config.get("type", "") == "SPAD":
                 # Create a sensor publisher node for each active sensor
-                link_len = len("link")
-                skin_str = sensor_key.find("_skin")
-                link_id = sensor_key[link_len:skin_str]
                 sensor_node = Node(
                     package="gentact_ros_tools_hybrid",
                     executable="pc_publisher",
@@ -179,7 +176,7 @@ def build_sensor_nodes(config, sensor_port_mapping):
                     parameters=[
                         {
                             "udp_port": sensor_config.get("port"),
-                            "link": link_id,
+                            "link": sensor_key,
                             "multicast": True,
                             "multicast_group": config["sensors"].get(
                                 "multicast_group", "239.0.0.1"
